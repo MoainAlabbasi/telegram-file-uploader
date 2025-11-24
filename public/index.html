@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📤 رفع الملفات إلى تيليجرام</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 50px 30px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+            transform: scale(1.02);
+        }
+
+        .upload-area.dragover {
+            border-color: #764ba2;
+            background: #e8ebff;
+            transform: scale(1.05);
+        }
+
+        .upload-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .upload-text {
+            color: #667eea;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            color: #999;
+            font-size: 14px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f2ff;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .file-info.show {
+            display: block;
+        }
+
+        .file-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            word-break: break-all;
+        }
+
+        .file-size {
+            color: #666;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        button:disabled::before {
+            display: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status.success {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .status.loading {
+            background: #d1ecf1;
+            border: 2px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .file-link {
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+
+        .file-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .file-link a:hover {
+            text-decoration: underline;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar.show {
+            display: block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* استجابة للشاشات الصغيرة */
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .upload-area {
+                padding: 40px 20px;
+            }
+
+            .upload-icon {
+                font-size: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📤 رفع الملفات إلى تيليجرام</h1>
+            <p class="subtitle">تخزين مجاني وغير محدود على خوادم تيليجرام</p>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">اضغط لاختيار ملف أو اسحبه هنا</div>
+            <div class="upload-hint">الحد الأقصى: 50 ميجابايت</div>
+            <input type="file" id="fileInput" accept="*/*">
+        </div>
+
+        <div class="file-info" id="fileInfo">
+            <div class="file-name" id="fileName"></div>
+            <div class="file-size" id="fileSize"></div>
+        </div>
+
+        <button id="uploadButton" disabled>رفع الملف</button>
+
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div class="footer">
+            مشروع مفتوح المصدر • 
+            <a href="https://github.com/MoainAlabbasi/telegram-file-uploader" target="_blank">GitHub</a>
+        </div>
+    </div>
+
+    <script>
+        // عناصر DOM
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const uploadButton = document.getElementById('uploadButton');
+        const status = document.getElementById('status');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+
+        let selectedFile = null;
+
+        // فتح نافذة اختيار الملف عند الضغط على المنطقة
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // معالجة اختيار الملف
+        fileInput.addEventListener('change', (e) => {
+            handleFile(e.target.files[0]);
+        });
+
+        // معالجة السحب والإفلات
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFile(e.dataTransfer.files[0]);
+        });
+
+        function handleFile(file) {
+            if (!file) return;
+
+            selectedFile = file;
+            
+            // عرض معلومات الملف
+            fileName.textContent = `📄 ${file.name}`;
+            fileSize.textContent = `📊 الحجم: ${formatBytes(file.size)}`;
+            fileInfo.classList.add('show');
+            
+            // تفعيل زر الرفع
+            uploadButton.disabled = false;
+            
+            // إخفاء الرسائل السابقة
+            status.classList.remove('show');
+        }
+
+        // رفع الملف
+        uploadButton.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            // تعطيل الزر
+            uploadButton.disabled = true;
+            uploadButton.textContent = 'جاري الرفع...';
+            
+            // إظهار شريط التقدم
+            progressBar.classList.add('show');
+            progressFill.style.width = '30%';
+            
+            // إخفاء الرسائل السابقة
+            status.classList.remove('show', 'success', 'error');
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                progressFill.style.width = '60%';
+                
+                // إرسال الملف إلى الخادم
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                progressFill.style.width = '90%';
+                const result = await response.json();
+                progressFill.style.width = '100%';
+
+                if (result.success) {
+                    status.className = 'status show success';
+                    status.innerHTML = `
+                        <strong>✓ ${result.message}</strong>
+                        <div class="file-link">
+                            <a href="${result.file_url}" target="_blank">
+                                🔗 فتح الملف في تيليجرام
+                            </a>
+                        </div>
+                    `;
+                    
+                    // إعادة تعيين النموذج بعد 3 ثواني
+                    setTimeout(() => {
+                        resetForm();
+                    }, 3000);
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                status.className = 'status show error';
+                status.innerHTML = `<strong>✗ خطأ:</strong> ${error.message}`;
+                
+                uploadButton.disabled = false;
+                uploadButton.textContent = 'إعادة المحاولة';
+            } finally {
+                setTimeout(() => {
+                    progressBar.classList.remove('show');
+                    progressFill.style.width = '0%';
+                }, 1000);
+            }
+        });
+
+        function resetForm() {
+            selectedFile = null;
+            fileInput.value = '';
+            fileInfo.classList.remove('show');
+            uploadButton.disabled = true;
+            uploadButton.textContent = 'رفع الملف';
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // فحص حالة الخادم عند تحميل الصفحة
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('/health');
+                const result = await response.json();
+                
+                if (!result.configured) {
+                    status.className = 'status show error';
+                    status.innerHTML = `<strong>⚠️ تحذير:</strong> ${result.message}`;
+                }
+            } catch (error) {
+                console.error('خطأ في فحص الخادم:', error);
+            }
+        });
+    </script>
+</body>
+</html>
