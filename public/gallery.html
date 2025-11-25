@@ -2,414 +2,577 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MoTech Gallery | معرض الملفات</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🖼️ معرض الملفات - Telegram File Manager</title>
     <style>
-        :root {
-            --primary: #667eea;
-            --secondary: #764ba2;
-            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --glass: rgba(255, 255, 255, 0.95);
-            --shadow: 0 20px 60px rgba(0,0,0,0.3);
-            --danger: #e53e3e;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: 'Tajawal', sans-serif;
-            background: var(--bg-gradient);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
-            color: #2d3748;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; }
-
-        /* --- الرأس والإحصائيات --- */
-        .header-card {
-            background: var(--glass);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            backdrop-filter: blur(10px);
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
             margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
-        .title-group h1 { font-size: 1.8rem; color: #2d3748; margin-bottom: 5px; }
-        .title-group p { color: #718096; font-size: 0.9rem; }
-
-        .back-btn {
-            background: rgba(102, 126, 234, 0.1);
-            color: var(--primary);
-            padding: 10px 20px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: 0.3s;
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
         }
-        .back-btn:hover { background: var(--primary); color: white; }
 
-        /* بطاقات الإحصائيات الصغيرة */
-        .stats-grid {
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
-            margin-top: 15px;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 20px;
+            margin-top: 20px;
         }
 
-        .stat-item { text-align: center; }
-        .stat-val { font-size: 1.5rem; font-weight: 800; color: var(--secondary); }
-        .stat-lbl { font-size: 0.85rem; color: #718096; }
+        .stat-card {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
 
-        /* --- التحكم والبحث --- */
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+
         .controls {
             background: white;
-            padding: 15px;
             border-radius: 15px;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
-        .search-box { flex: 1; min-width: 200px; }
-        .search-input {
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
             width: 100%;
             padding: 12px 15px;
-            border: 2px solid #e2e8f0;
+            border: 2px solid #e0e0e0;
             border-radius: 10px;
-            font-family: 'Tajawal';
-            font-size: 1rem;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
             outline: none;
+            border-color: #667eea;
         }
-        .search-input:focus { border-color: var(--primary); }
 
-        .filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
         .filter-btn {
-            padding: 8px 16px;
-            border: none;
-            background: #edf2f7;
-            color: #4a5568;
-            border-radius: 20px;
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
             cursor: pointer;
-            font-family: 'Tajawal';
-            font-weight: 500;
-            white-space: nowrap;
-            transition: 0.3s;
-        }
-        .filter-btn.active, .filter-btn:hover {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s;
+            font-size: 14px;
         }
 
-        /* --- شبكة العرض --- */
-        .gallery-grid {
+        .filter-btn:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
+            margin-bottom: 30px;
         }
 
         .file-card {
             background: white;
-            border-radius: 18px;
+            border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
-            transition: 0.3s;
-            display: flex;
-            flex-direction: column;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
             animation: fadeIn 0.5s ease;
         }
 
-        .file-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        /* منطقة المعاينة */
-        .preview-area {
-            height: 160px;
-            background: #f7fafc;
+        .file-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .file-icon {
+            height: 150px;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            position: relative;
+            font-size: 60px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8ebff 100%);
         }
 
-        .preview-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .file-card:hover .preview-img { transform: scale(1.05); }
-        
-        .type-badge {
-            position: absolute;
-            top: 10px; right: 10px;
-            background: rgba(0,0,0,0.6); color: white;
-            padding: 4px 10px; border-radius: 8px;
-            font-size: 0.75rem; backdrop-filter: blur(4px);
+        .file-info {
+            padding: 15px;
         }
 
-        .preview-icon { font-size: 50px; color: #cbd5e0; }
+        .file-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            word-break: break-word;
+            font-size: 14px;
+        }
 
-        /* المحتوى */
-        .card-body { padding: 15px; flex: 1; display: flex; flex-direction: column; }
-        
-        .file-title {
-            font-weight: 700; font-size: 1rem; color: #2d3748;
+        .file-meta {
+            font-size: 12px;
+            color: #999;
             margin-bottom: 5px;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
-        .file-desc {
-            font-size: 0.85rem; color: #718096; margin-bottom: 12px;
-            height: 36px; overflow: hidden; display: -webkit-box;
-            -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+        .file-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
         }
 
-        .meta-info {
-            display: flex; justify-content: space-between;
-            font-size: 0.75rem; color: #a0aec0;
-            margin-bottom: 15px; padding-bottom: 10px;
-            border-bottom: 1px solid #edf2f7;
-        }
-
-        /* الأزرار */
-        .actions { display: flex; gap: 8px; margin-top: auto; }
-        
         .btn {
-            flex: 1; padding: 8px; border-radius: 8px;
-            text-decoration: none; font-size: 0.85rem; font-weight: 600;
-            text-align: center; transition: 0.2s;
-            display: flex; align-items: center; justify-content: center; gap: 4px;
-            border: none; cursor: pointer;
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
         }
 
-        .btn-view { background: #edf2f7; color: #4a5568; }
-        .btn-view:hover { background: #e2e8f0; }
-        
-        .btn-dl { background: var(--bg-gradient); color: white; }
-        .btn-dl:hover { opacity: 0.9; }
-
-        /* .btn-del { background: #fed7d7; color: #c53030; flex: 0 0 35px; }
-        .btn-del:hover { background: #feb2b2; } */
-
-        /* حالات التحميل والخطأ */
-        .loading, .empty-state { text-align: center; padding: 40px; color: white; grid-column: 1 / -1; }
-        .loader {
-            width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.3);
-            border-top: 4px solid white; border-radius: 50%;
-            animation: spin 1s linear infinite; margin: 0 auto 15px;
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
-        .empty-icon { font-size: 60px; margin-bottom: 10px; opacity: 0.8; }
 
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; } }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
 
-        /* للجوال */
-        @media (max-width: 600px) {
-            .gallery-grid { grid-template-columns: 1fr; }
-            .header-top { flex-direction: column; text-align: center; }
-            .stats-grid { grid-template-columns: 1fr 1fr; }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .empty-text {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .error-message {
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+
+            .filter-buttons {
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <div class="header-card">
-            <div class="header-top">
-                <div class="title-group">
-                    <h1>📂 معرض MoTech</h1>
-                    <p>أرشيف الملفات السحابي الذكي</p>
+        <a href="/" class="back-link">← العودة للرفع</a>
+
+        <div class="header">
+            <h1>🖼️ معرض الملفات</h1>
+            <p class="subtitle">جميع الملفات المرفوعة إلى تيليجرام</p>
+
+            <div class="stats" id="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalFiles">-</div>
+                    <div class="stat-label">إجمالي الملفات</div>
                 </div>
-                <a href="/" class="back-btn">⚡ رفع ملف جديد</a>
-            </div>
-            
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-val" id="statCount">0</div>
-                    <div class="stat-lbl">ملف</div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalSize">-</div>
+                    <div class="stat-label">الحجم الكلي</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-val" id="statSize">0 MB</div>
-                    <div class="stat-lbl">الحجم الكلي</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-val" id="statTypes">0</div>
-                    <div class="stat-lbl">نوع ملفات</div>
+                <div class="stat-card">
+                    <div class="stat-value" id="fileTypes">-</div>
+                    <div class="stat-label">أنواع الملفات</div>
                 </div>
             </div>
         </div>
 
         <div class="controls">
             <div class="search-box">
-                <input type="text" id="searchInput" class="search-input" placeholder="🔍 ابحث بالاسم أو الوصف...">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="🔍 ابحث عن ملف..."
+                    autocomplete="off"
+                >
             </div>
-            <div class="filters">
-                <button class="filter-btn active" data-filter="all">الكل</button>
-                <button class="filter-btn" data-filter="image">صور</button>
-                <button class="filter-btn" data-filter="video">فيديو</button>
-                <button class="filter-btn" data-filter="document">مستندات</button>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-type="all">الكل</button>
+                <button class="filter-btn" data-type="image">📷 صور</button>
+                <button class="filter-btn" data-type="video">🎥 فيديو</button>
+                <button class="filter-btn" data-type="audio">🎵 صوت</button>
+                <button class="filter-btn" data-type="document">📄 مستندات</button>
             </div>
         </div>
 
-        <div id="galleryContainer" class="gallery-grid">
+        <div id="content">
             <div class="loading">
-                <div class="loader"></div>
-                <p>جاري جلب الملفات من السيرفر...</p>
+                <div class="loading-spinner"></div>
+                <p>جاري تحميل الملفات...</p>
             </div>
         </div>
     </div>
 
     <script>
-        let allFiles = []; // المخزن المحلي
+        let allFiles = [];
+        let currentFilter = 'all';
 
-        // التشغيل عند التحميل
+        // تحميل الملفات عند فتح الصفحة
         window.addEventListener('load', async () => {
             await loadFiles();
+            await loadStats();
         });
 
-        // 1. جلب الملفات من المسار الصحيح
+        // تحميل الملفات من API
         async function loadFiles() {
             try {
-                // هذا هو المسار الموجود في server.js V3
-                const response = await fetch('/files');
+                const response = await fetch('/api/files?limit=1000');
                 const result = await response.json();
 
-                // التحقق من صحة البيانات
-                if (Array.isArray(result)) {
-                    allFiles = result;
-                } else if (result.success && result.files) {
+                if (result.success) {
                     allFiles = result.files;
+                    displayFiles(allFiles);
+                    updateStats(result.total);
                 } else {
-                    allFiles = [];
+                    showError('فشل تحميل الملفات: ' + result.error);
                 }
-
-                updateStats();
-                renderGallery(allFiles);
-
             } catch (error) {
-                document.getElementById('galleryContainer').innerHTML = `
-                    <div class="empty-state">
-                        <div style="font-size: 40px">⚠️</div>
-                        <h3>فشل الاتصال</h3>
-                        <p>${error.message}</p>
-                        <button class="btn btn-view" onclick="location.reload()" style="max-width:150px; margin:20px auto;">إعادة المحاولة</button>
-                    </div>
-                `;
+                showError('خطأ في الاتصال بالخادم: ' + error.message);
             }
         }
 
-        // 2. تحديث الإحصائيات محلياً (بدون سيرفر)
-        function updateStats() {
-            const totalCount = allFiles.length;
-            const totalSize = allFiles.reduce((acc, curr) => acc + (curr.file_size || 0), 0);
-            const types = new Set(allFiles.map(f => f.file_type ? f.file_type.split('/')[0] : 'other')).size;
+        // تحميل الإحصائيات
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const result = await response.json();
 
-            document.getElementById('statCount').textContent = totalCount;
-            document.getElementById('statSize').textContent = formatBytes(totalSize);
-            document.getElementById('statTypes').textContent = types;
+                if (result.success && result.stats) {
+                    document.getElementById('totalFiles').textContent = result.stats.total_files || 0;
+                    document.getElementById('totalSize').textContent = formatBytes(result.stats.total_size || 0);
+                    document.getElementById('fileTypes').textContent = result.stats.file_types_count || 0;
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل الإحصائيات:', error);
+            }
         }
 
-        // 3. رسم المعرض
-        function renderGallery(files) {
-            const container = document.getElementById('galleryContainer');
-            container.innerHTML = '';
+        // عرض الملفات
+        function displayFiles(files) {
+            const content = document.getElementById('content');
 
-            if (files.length === 0) {
-                container.innerHTML = `
+            if (!files || files.length === 0) {
+                content.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">📭</div>
-                        <h3>المعرض فارغ</h3>
-                        <p>لا توجد ملفات مطابقة للبحث</p>
+                        <div class="empty-text">لا توجد ملفات بعد</div>
+                        <a href="/" class="btn btn-primary" style="max-width: 200px; margin: 0 auto;">ارفع أول ملف</a>
                     </div>
                 `;
                 return;
             }
 
+            const gallery = document.createElement('div');
+            gallery.className = 'gallery';
+
             files.forEach(file => {
-                // استخدام الجسر الذكي للعرض
-                const proxyLink = `/view/${file.telegram_file_id}`;
-                const isImage = file.file_type && file.file_type.includes('image');
-                
-                let icon = '📄';
-                if (file.file_type?.includes('video')) icon = '🎥';
-                if (file.file_type?.includes('audio')) icon = '🎵';
-
-                const html = `
-                    <div class="file-card">
-                        <div class="preview-area">
-                            <div class="type-badge">${file.mime_type ? file.mime_type.split('/')[1] : 'FILE'}</div>
-                            ${isImage 
-                                ? `<img src="${proxyLink}" class="preview-img" loading="lazy" alt="${file.file_name}">` 
-                                : `<div class="preview-icon">${icon}</div>`
-                            }
-                        </div>
-                        <div class="card-body">
-                            <div class="file-title" title="${file.file_name}">${file.file_name}</div>
-                            <div class="file-desc">${file.description || 'لا يوجد وصف'}</div>
-                            
-                            <div class="meta-info">
-                                <span>${formatBytes(file.file_size)}</span>
-                                <span>${new Date(file.created_at).toLocaleDateString('ar-SA')}</span>
-                            </div>
-
-                            <div class="actions">
-                                <a href="${proxyLink}" target="_blank" class="btn btn-view">👁️ عرض</a>
-                                <a href="${proxyLink}" download="${file.file_name}" class="btn btn-dl">⬇️ تحميل</a>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.insertAdjacentHTML('beforeend', html);
+                const card = createFileCard(file);
+                gallery.appendChild(card);
             });
+
+            content.innerHTML = '';
+            content.appendChild(gallery);
         }
 
-        // 4. البحث والفلترة (Client Side)
+        // إنشاء بطاقة ملف
+        function createFileCard(file) {
+            const card = document.createElement('div');
+            card.className = 'file-card';
+            card.dataset.type = file.file_type;
+
+            const icon = getFileIcon(file.file_type);
+            const date = new Date(file.created_at).toLocaleDateString('ar-SA');
+
+            card.innerHTML = `
+                <div class="file-icon">${icon}</div>
+                <div class="file-info">
+                    <div class="file-name">${escapeHtml(file.file_name)}</div>
+                    <div class="file-meta">📊 ${formatBytes(file.file_size)}</div>
+                    <div class="file-meta">📅 ${date}</div>
+                    <div class="file-actions">
+                        <a href="${file.telegram_url}" target="_blank" class="btn btn-primary">فتح</a>
+                        <button class="btn btn-danger" onclick="deleteFile(${file.id}, '${escapeHtml(file.file_name)}')">حذف</button>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // حذف ملف
+        async function deleteFile(fileId, fileName) {
+            if (!confirm(`هل أنت متأكد من حذف "${fileName}"؟`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/files/${fileId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✓ تم حذف الملف بنجاح');
+                    await loadFiles();
+                    await loadStats();
+                } else {
+                    alert('✗ فشل حذف الملف: ' + result.error);
+                }
+            } catch (error) {
+                alert('✗ خطأ: ' + error.message);
+            }
+        }
+
+        // البحث
         const searchInput = document.getElementById('searchInput');
-        const filterBtns = document.querySelectorAll('.filter-btn');
+        let searchTimeout;
 
         searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            const filtered = allFiles.filter(file => 
-                (file.file_name && file.file_name.toLowerCase().includes(term)) || 
-                (file.description && file.description.toLowerCase().includes(term))
-            );
-            renderGallery(filtered);
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const query = e.target.value.trim();
+                if (query) {
+                    searchFiles(query);
+                } else {
+                    filterFiles(currentFilter);
+                }
+            }, 300);
         });
 
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                filterBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const type = btn.dataset.filter;
-                
-                if (type === 'all') {
-                    renderGallery(allFiles);
+        // البحث عن ملفات
+        async function searchFiles(query) {
+            try {
+                const response = await fetch(`/api/files/search?q=${encodeURIComponent(query)}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    displayFiles(result.files);
                 } else {
-                    const filtered = allFiles.filter(file => file.file_type && file.file_type.includes(type));
-                    renderGallery(filtered);
+                    showError('فشل البحث: ' + result.error);
                 }
+            } catch (error) {
+                showError('خطأ في البحث: ' + error.message);
+            }
+        }
+
+        // الفلترة
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.type;
+                searchInput.value = '';
+                filterFiles(currentFilter);
             });
         });
 
-        // تنسيق الحجم
-        function formatBytes(bytes, decimals = 2) {
-            if (!+bytes) return '0 Bytes';
+        function filterFiles(type) {
+            if (type === 'all') {
+                displayFiles(allFiles);
+            } else {
+                const filtered = allFiles.filter(f => f.file_type === type);
+                displayFiles(filtered);
+            }
+        }
+
+        // دوال مساعدة
+        function getFileIcon(type) {
+            const icons = {
+                'image': '🖼️',
+                'video': '🎥',
+                'audio': '🎵',
+                'document': '📄'
+            };
+            return icons[type] || '📁';
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
             const k = 1024;
             const sizes = ['Bytes', 'KB', 'MB', 'GB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(decimals))} ${sizes[i]}`;
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        function updateStats(total) {
+            document.getElementById('totalFiles').textContent = total || allFiles.length;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showError(message) {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="error-message">
+                    <strong>❌ خطأ:</strong> ${message}
+                </div>
+                <div class="empty-state">
+                    <div class="empty-icon">⚠️</div>
+                    <div class="empty-text">حدث خطأ في تحميل الملفات</div>
+                    <button class="btn btn-primary" onclick="location.reload()">إعادة المحاولة</button>
+                </div>
+            `;
         }
     </script>
 </body>
