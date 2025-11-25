@@ -2,502 +2,352 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📤 رفع الملفات إلى تيليجرام</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MoTech Cloud | رافع الملفات الذكي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass: rgba(255, 255, 255, 0.95);
+            --shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Tajawal', sans-serif;
+            background: var(--bg-gradient);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 600px;
-            width: 100%;
-            padding: 40px;
-            animation: slideUp 0.5s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        h1 {
+            padding: 15px;
             color: #333;
-            margin-bottom: 10px;
-            font-size: 28px;
         }
 
-        .subtitle {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .upload-area {
-            border: 3px dashed #667eea;
-            border-radius: 15px;
-            padding: 50px 30px;
-            text-align: center;
-            background: #f8f9ff;
-            transition: all 0.3s ease;
-            cursor: pointer;
+        /* الحاوية الرئيسية بتصميم متجاوب */
+        .container {
+            background: var(--glass);
+            border-radius: 25px;
+            box-shadow: var(--shadow);
+            max-width: 550px;
+            width: 100%;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
 
-        .upload-area:hover {
-            border-color: #764ba2;
-            background: #f0f2ff;
-            transform: scale(1.02);
+        /* تحسينات للجوال */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+                border-radius: 20px;
+            }
+            h1 { font-size: 1.4rem !important; }
+            .subtitle { font-size: 0.9rem !important; }
+            .upload-area { padding: 30px 15px !important; }
         }
 
-        .upload-area.dragover {
-            border-color: #764ba2;
-            background: #e8ebff;
-            transform: scale(1.05);
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .upload-icon {
-            font-size: 60px;
-            margin-bottom: 20px;
-            animation: bounce 2s infinite;
+        .header { text-align: center; margin-bottom: 25px; }
+        h1 { color: #2d3748; margin-bottom: 8px; font-weight: 800; font-size: 1.8rem; }
+        .subtitle { color: #718096; font-size: 1rem; }
+
+        /* منطقة الرفع */
+        .upload-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: 18px;
+            padding: 40px 20px;
+            text-align: center;
+            background: #f7fafc;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
         }
 
-        @keyframes bounce {
+        .upload-area:active { transform: scale(0.98); }
+        .upload-area.dragover { border-color: var(--secondary); background: #ebf4ff; transform: scale(1.02); }
+        
+        .upload-icon { font-size: 48px; margin-bottom: 15px; animation: float 3s ease-in-out infinite; }
+        
+        @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
 
-        .upload-text {
-            color: #667eea;
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
+        .upload-text { color: #4a5568; font-weight: 600; margin-bottom: 5px; }
+        .upload-hint { color: #a0aec0; font-size: 0.85rem; }
 
-        .upload-hint {
-            color: #999;
-            font-size: 14px;
+        /* حقل الوصف الجديد */
+        .input-group { margin-top: 20px; }
+        .desc-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
         }
+        .desc-input:focus { border-color: var(--primary); background: #fff; }
 
-        input[type="file"] {
-            display: none;
-        }
-
+        /* معلومات الملف */
         .file-info {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f0f2ff;
-            border-radius: 10px;
+            margin-top: 15px;
+            padding: 12px;
+            background: #edf2f7;
+            border-radius: 12px;
             display: none;
-            animation: fadeIn 0.3s ease;
+            border-right: 4px solid var(--primary);
         }
+        .file-info.show { display: block; animation: fadeIn 0.3s; }
+        .file-name { font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .file-info.show {
-            display: block;
-        }
-
-        .file-name {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-            word-break: break-all;
-        }
-
-        .file-size {
-            color: #666;
-            font-size: 14px;
-        }
-
-        button {
+        /* زر الرفع */
+        .btn-upload {
             width: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg-gradient);
             color: white;
-            padding: 15px;
+            padding: 16px;
             border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: 'Tajawal', sans-serif;
             cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
+            margin-top: 25px;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
         }
+        .btn-upload:disabled { background: #cbd5e0; cursor: not-allowed; box-shadow: none; }
+        .btn-upload:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4); }
 
-        button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        button:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        button:disabled::before {
-            display: none;
-        }
-
-        .status {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            display: none;
-            animation: slideDown 0.3s ease;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .status.show {
-            display: block;
-        }
-
-        .status.success {
-            background: #d4edda;
-            border: 2px solid #c3e6cb;
-            color: #155724;
-        }
-
-        .status.error {
-            background: #f8d7da;
-            border: 2px solid #f5c6cb;
-            color: #721c24;
-        }
-
-        .status.loading {
-            background: #d1ecf1;
-            border: 2px solid #bee5eb;
-            color: #0c5460;
-        }
-
-        .file-link {
-            margin-top: 10px;
-            padding: 10px;
-            background: white;
-            border-radius: 5px;
-            word-break: break-all;
-        }
-
-        .file-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .file-link a:hover {
-            text-decoration: underline;
-        }
-
-        .progress-bar {
-            width: 100%;
+        /* شريط التقدم */
+        .progress-container {
             height: 6px;
-            background: #e0e0e0;
+            background: #e2e8f0;
             border-radius: 3px;
-            margin-top: 10px;
+            margin-top: 15px;
             overflow: hidden;
             display: none;
         }
-
-        .progress-bar.show {
-            display: block;
-        }
-
-        .progress-fill {
+        .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg-gradient);
             width: 0%;
             transition: width 0.3s ease;
-            animation: pulse 1.5s infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
+        /* الحالة */
+        .status { margin-top: 20px; padding: 15px; border-radius: 12px; display: none; font-size: 0.95rem; line-height: 1.5; }
+        .status.success { background: #c6f6d5; color: #22543d; border: 1px solid #9ae6b4; }
+        .status.error { background: #fed7d7; color: #822727; border: 1px solid #feb2b2; }
 
+        /* أزرار النتيجة */
+        .result-actions { display: flex; gap: 10px; margin-top: 10px; }
+        .action-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .btn-view { background: #fff; color: #333; border: 1px solid #ccc; }
+        .btn-dl { background: #2ecc71; color: white; border: none; }
+
+        /* التذييل MoTech */
         .footer {
             margin-top: 30px;
             text-align: center;
-            color: #999;
-            font-size: 12px;
+            font-size: 0.85rem;
+            color: #718096;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 15px;
+        }
+        .motech-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #667eea11, #764ba211);
+            padding: 5px 15px;
+            border-radius: 20px;
+            color: var(--secondary);
+            font-weight: 700;
+            margin-top: 5px;
         }
 
-        .footer a {
-            color: #667eea;
-            text-decoration: none;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* استجابة للشاشات الصغيرة */
-        @media (max-width: 600px) {
-            .container {
-                padding: 30px 20px;
-            }
-
-            h1 {
-                font-size: 24px;
-            }
-
-            .upload-area {
-                padding: 40px 20px;
-            }
-
-            .upload-icon {
-                font-size: 50px;
-            }
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
+
     <div class="container">
         <div class="header">
-            <h1>📤 رفع الملفات إلى تيليجرام</h1>
-            <p class="subtitle">تخزين مجاني وغير محدود على خوادم تيليجرام</p>
+            <h1>🚀 MoTech Cloud</h1>
+            <p class="subtitle">التخزين السحابي الآمن والذكي</p>
         </div>
 
-        <div class="upload-area" id="uploadArea">
-            <div class="upload-icon">📁</div>
-            <div class="upload-text">اضغط لاختيار ملف أو اسحبه هنا</div>
-            <div class="upload-hint">الحد الأقصى: 50 ميجابايت</div>
-            <input type="file" id="fileInput" accept="*/*">
+        <form id="uploadForm">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">☁️</div>
+                <div class="upload-text">اضغط أو اسحب الملف هنا</div>
+                <div class="upload-hint">صور، فيديو، مستندات (Max: 50MB)</div>
+                <input type="file" id="fileInput" name="file" hidden>
+            </div>
+
+            <div class="file-info" id="fileInfo">
+                <div class="file-name" id="fileNameName"></div>
+                <div style="font-size: 0.8rem; color: #666;" id="fileSize"></div>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="descInput" name="description" class="desc-input" placeholder="📝 أضف وصفاً للملف (اختياري)...">
+            </div>
+
+            <button type="submit" class="btn-upload" id="uploadBtn" disabled>📤 رفع الملف</button>
+        </form>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
         </div>
 
-        <div class="file-info" id="fileInfo">
-            <div class="file-name" id="fileName"></div>
-            <div class="file-size" id="fileSize"></div>
-        </div>
-
-        <button id="uploadButton" disabled>رفع الملف</button>
-
-        <div class="progress-bar" id="progressBar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-
-        <div class="status" id="status"></div>
+        <div class="status" id="statusMessage"></div>
 
         <div class="footer">
-            <a href="/gallery" style="color: #667eea; font-weight: bold; margin-left: 15px;">🖼️ معرض الملفات</a> • 
-            مشروع مفتوح المصدر • 
-            <a href="https://github.com/MoainAlabbasi/telegram-file-uploader" target="_blank">GitHub</a>
+            <div>
+                <a href="/gallery" style="color: var(--primary); text-decoration: none; font-weight: bold;">📂 المعرض</a>
+            </div>
+            <div style="margin-top: 10px;">
+                تم التطوير بواسطة
+                <div class="motech-badge">MoTech Team 💻</div>
+            </div>
         </div>
     </div>
 
     <script>
-        // عناصر DOM
-        const uploadArea = document.getElementById('uploadArea');
+        const form = document.getElementById('uploadForm');
         const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const uploadBtn = document.getElementById('uploadBtn');
         const fileInfo = document.getElementById('fileInfo');
-        const fileName = document.getElementById('fileName');
-        const fileSize = document.getElementById('fileSize');
-        const uploadButton = document.getElementById('uploadButton');
-        const status = document.getElementById('status');
+        const statusMsg = document.getElementById('statusMessage');
+        const progressContainer = document.getElementById('progressContainer');
         const progressBar = document.getElementById('progressBar');
-        const progressFill = document.getElementById('progressFill');
 
-        let selectedFile = null;
+        // التعامل مع اختيار الملف
+        uploadArea.addEventListener('click', () => fileInput.click());
 
-        // فتح نافذة اختيار الملف عند الضغط على المنطقة
-        uploadArea.addEventListener('click', () => {
-            fileInput.click();
-        });
+        fileInput.addEventListener('change', handleFileSelect);
 
-        // معالجة اختيار الملف
-        fileInput.addEventListener('change', (e) => {
-            handleFile(e.target.files[0]);
-        });
-
-        // معالجة السحب والإفلات
+        // سحب وإفلات
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
-            uploadArea.classList.add('dragover');
+            uploadArea.style.borderColor = 'var(--secondary)';
+            uploadArea.style.background = '#ebf4ff';
         });
 
         uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
+            uploadArea.style.borderColor = '#cbd5e0';
+            uploadArea.style.background = '#f7fafc';
         });
 
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            handleFile(e.dataTransfer.files[0]);
+            uploadArea.style.borderColor = '#cbd5e0';
+            uploadArea.style.background = '#f7fafc';
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelect();
+            }
         });
 
-        function handleFile(file) {
-            if (!file) return;
-
-            selectedFile = file;
-            
-            // عرض معلومات الملف
-            fileName.textContent = `📄 ${file.name}`;
-            fileSize.textContent = `📊 الحجم: ${formatBytes(file.size)}`;
-            fileInfo.classList.add('show');
-            
-            // تفعيل زر الرفع
-            uploadButton.disabled = false;
-            
-            // إخفاء الرسائل السابقة
-            status.classList.remove('show');
+        function handleFileSelect() {
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                document.getElementById('fileNameName').textContent = file.name;
+                document.getElementById('fileSize').textContent = formatBytes(file.size);
+                fileInfo.classList.add('show');
+                uploadBtn.disabled = false;
+                statusMsg.style.display = 'none';
+            }
         }
 
-        // رفع الملف
-        uploadButton.addEventListener('click', async () => {
-            if (!selectedFile) return;
+        // عملية الرفع
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!fileInput.files.length) return;
 
-            // تعطيل الزر
-            uploadButton.disabled = true;
-            uploadButton.textContent = 'جاري الرفع...';
+            const formData = new FormData(form);
             
-            // إظهار شريط التقدم
-            progressBar.classList.add('show');
-            progressFill.style.width = '30%';
-            
-            // إخفاء الرسائل السابقة
-            status.classList.remove('show', 'success', 'error');
-
-            const formData = new FormData();
-            formData.append('file', selectedFile);
+            // UI Updates
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = '⏳ جاري الرفع...';
+            progressContainer.style.display = 'block';
+            statusMsg.style.display = 'none';
+            progressBar.style.width = '0%';
 
             try {
-                progressFill.style.width = '60%';
-                
-                // إرسال الملف إلى الخادم
+                // محاكاة شريط التقدم (لأن fetch لا يدعم progress natively بسهولة)
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 10;
+                    if (progress > 90) progress = 90;
+                    progressBar.style.width = `${progress}%`;
+                }, 200);
+
                 const response = await fetch('/upload', {
                     method: 'POST',
                     body: formData
                 });
 
-                progressFill.style.width = '90%';
-                const result = await response.json();
-                progressFill.style.width = '100%';
+                clearInterval(interval);
+                progressBar.style.width = '100%';
 
-                if (result.success) {
-                    status.className = 'status show success';
-                    status.innerHTML = `
-                        <strong>✓ ${result.message}</strong>
-                        <div class="file-link">
-                            <a href="${result.file_url}" target="_blank">
-                                🔗 فتح الملف في تيليجرام
-                            </a>
+                const result = await response.json();
+
+                if (response.ok) {
+                    statusMsg.className = 'status success show';
+                    statusMsg.style.display = 'block';
+                    // هنا تظهر أزرار العرض والتحميل الجديدة
+                    statusMsg.innerHTML = `
+                        ✅ <strong>تم الرفع بنجاح!</strong><br>
+                        <div class="result-actions">
+                            <a href="/gallery" class="action-btn btn-view">📂 المعرض</a>
                         </div>
                     `;
-                    
-                    // إعادة تعيين النموذج بعد 3 ثواني
-                    setTimeout(() => {
-                        resetForm();
-                    }, 3000);
+                    form.reset();
+                    fileInfo.classList.remove('show');
                 } else {
-                    throw new Error(result.error);
+                    throw new Error(result.error || 'فشل الرفع');
                 }
             } catch (error) {
-                status.className = 'status show error';
-                status.innerHTML = `<strong>✗ خطأ:</strong> ${error.message}`;
-                
-                uploadButton.disabled = false;
-                uploadButton.textContent = 'إعادة المحاولة';
+                statusMsg.className = 'status error show';
+                statusMsg.style.display = 'block';
+                statusMsg.innerHTML = `❌ <strong>خطأ:</strong> ${error.message}`;
             } finally {
-                setTimeout(() => {
-                    progressBar.classList.remove('show');
-                    progressFill.style.width = '0%';
-                }, 1000);
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = '📤 رفع الملف';
+                setTimeout(() => { progressContainer.style.display = 'none'; }, 1000);
             }
         });
 
-        function resetForm() {
-            selectedFile = null;
-            fileInput.value = '';
-            fileInfo.classList.remove('show');
-            uploadButton.disabled = true;
-            uploadButton.textContent = 'رفع الملف';
-        }
-
-        function formatBytes(bytes) {
-            if (bytes === 0) return '0 Bytes';
+        function formatBytes(bytes, decimals = 2) {
+            if (!+bytes) return '0 Bytes';
             const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
         }
-
-        // فحص حالة الخادم عند تحميل الصفحة
-        window.addEventListener('load', async () => {
-            try {
-                const response = await fetch('/health');
-                const result = await response.json();
-                
-                if (!result.configured) {
-                    status.className = 'status show error';
-                    status.innerHTML = `<strong>⚠️ تحذير:</strong> ${result.message}`;
-                }
-            } catch (error) {
-                console.error('خطأ في فحص الخادم:', error);
-            }
-        });
     </script>
 </body>
 </html>
