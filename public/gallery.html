@@ -12,6 +12,7 @@
             --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --glass: rgba(255, 255, 255, 0.95);
             --shadow: 0 20px 60px rgba(0,0,0,0.3);
+            --danger: #e53e3e;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -21,28 +22,28 @@
             background: var(--bg-gradient);
             min-height: 100vh;
             padding: 20px;
-            color: #333;
+            color: #2d3748;
         }
 
-        /* الحاوية الرئيسية */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1200px; margin: 0 auto; }
 
-        /* الرأس */
+        /* --- الرأس والإحصائيات --- */
         .header-card {
             background: var(--glass);
             border-radius: 20px;
             padding: 25px;
             margin-bottom: 25px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 20px;
             flex-wrap: wrap;
             gap: 15px;
-            backdrop-filter: blur(10px);
         }
 
         .title-group h1 { font-size: 1.8rem; color: #2d3748; margin-bottom: 5px; }
@@ -59,7 +60,21 @@
         }
         .back-btn:hover { background: var(--primary); color: white; }
 
-        /* شريط البحث والفلتر */
+        /* بطاقات الإحصائيات الصغيرة */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 20px;
+        }
+
+        .stat-item { text-align: center; }
+        .stat-val { font-size: 1.5rem; font-weight: 800; color: var(--secondary); }
+        .stat-lbl { font-size: 0.85rem; color: #718096; }
+
+        /* --- التحكم والبحث --- */
         .controls {
             background: white;
             padding: 15px;
@@ -102,21 +117,19 @@
             box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
         }
 
-        /* شبكة الملفات */
+        /* --- شبكة العرض --- */
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* متجاوب */
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 20px;
         }
 
-        /* بطاقة الملف */
         .file-card {
             background: white;
             border-radius: 18px;
             overflow: hidden;
             box-shadow: 0 10px 20px rgba(0,0,0,0.08);
             transition: 0.3s;
-            position: relative;
             display: flex;
             flex-direction: column;
             animation: fadeIn 0.5s ease;
@@ -126,7 +139,7 @@
 
         /* منطقة المعاينة */
         .preview-area {
-            height: 180px;
+            height: 160px;
             background: #f7fafc;
             display: flex;
             align-items: center;
@@ -140,96 +153,73 @@
         
         .type-badge {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.6);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            backdrop-filter: blur(4px);
+            top: 10px; right: 10px;
+            background: rgba(0,0,0,0.6); color: white;
+            padding: 4px 10px; border-radius: 8px;
+            font-size: 0.75rem; backdrop-filter: blur(4px);
         }
 
-        .preview-icon { font-size: 60px; color: #cbd5e0; }
+        .preview-icon { font-size: 50px; color: #cbd5e0; }
 
-        /* تفاصيل الملف */
+        /* المحتوى */
         .card-body { padding: 15px; flex: 1; display: flex; flex-direction: column; }
         
         .file-title {
-            font-weight: 700;
-            font-size: 1rem;
-            color: #2d3748;
+            font-weight: 700; font-size: 1rem; color: #2d3748;
             margin-bottom: 5px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
         .file-desc {
-            font-size: 0.85rem;
-            color: #718096;
-            margin-bottom: 15px;
-            line-height: 1.4;
-            height: 38px; /* سطرين */
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
+            font-size: 0.85rem; color: #718096; margin-bottom: 12px;
+            height: 36px; overflow: hidden; display: -webkit-box;
+            -webkit-line-clamp: 2; -webkit-box-orient: vertical;
         }
 
         .meta-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: #a0aec0;
-            margin-bottom: 15px;
+            display: flex; justify-content: space-between;
+            font-size: 0.75rem; color: #a0aec0;
+            margin-bottom: 15px; padding-bottom: 10px;
             border-bottom: 1px solid #edf2f7;
-            padding-bottom: 10px;
         }
 
-        /* أزرار الإجراءات */
+        /* الأزرار */
         .actions { display: flex; gap: 8px; margin-top: auto; }
         
         .btn {
-            flex: 1;
-            padding: 10px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-align: center;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
+            flex: 1; padding: 8px; border-radius: 8px;
+            text-decoration: none; font-size: 0.85rem; font-weight: 600;
+            text-align: center; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 4px;
+            border: none; cursor: pointer;
         }
 
         .btn-view { background: #edf2f7; color: #4a5568; }
         .btn-view:hover { background: #e2e8f0; }
+        
+        .btn-dl { background: var(--bg-gradient); color: white; }
+        .btn-dl:hover { opacity: 0.9; }
 
-        .btn-download { background: var(--bg-gradient); color: white; }
-        .btn-download:hover { opacity: 0.9; box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3); }
+        /* .btn-del { background: #fed7d7; color: #c53030; flex: 0 0 35px; }
+        .btn-del:hover { background: #feb2b2; } */
 
-        /* حالة التحميل */
-        .loading { text-align: center; padding: 40px; color: white; }
+        /* حالات التحميل والخطأ */
+        .loading, .empty-state { text-align: center; padding: 40px; color: white; grid-column: 1 / -1; }
         .loader {
-            width: 40px; height: 40px;
-            border: 4px solid rgba(255,255,255,0.3);
-            border-top: 4px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white; border-radius: 50%;
+            animation: spin 1s linear infinite; margin: 0 auto 15px;
         }
+        .empty-icon { font-size: 60px; margin-bottom: 10px; opacity: 0.8; }
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; } }
 
         /* للجوال */
         @media (max-width: 600px) {
-            .gallery-grid { grid-template-columns: 1fr; } /* بطاقة واحدة في السطر */
-            .header-card { flex-direction: column; text-align: center; }
-            .controls { flex-direction: column; }
+            .gallery-grid { grid-template-columns: 1fr; }
+            .header-top { flex-direction: column; text-align: center; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
@@ -237,11 +227,28 @@
 
     <div class="container">
         <div class="header-card">
-            <div class="title-group">
-                <h1>📂 معرض MoTech</h1>
-                <p>تصفح وتحميل ملفاتك المخزنة سحابياً</p>
+            <div class="header-top">
+                <div class="title-group">
+                    <h1>📂 معرض MoTech</h1>
+                    <p>أرشيف الملفات السحابي الذكي</p>
+                </div>
+                <a href="/" class="back-btn">⚡ رفع ملف جديد</a>
             </div>
-            <a href="/" class="back-btn">⚡ رفع ملف جديد</a>
+            
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-val" id="statCount">0</div>
+                    <div class="stat-lbl">ملف</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val" id="statSize">0 MB</div>
+                    <div class="stat-lbl">الحجم الكلي</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val" id="statTypes">0</div>
+                    <div class="stat-lbl">نوع ملفات</div>
+                </div>
+            </div>
         </div>
 
         <div class="controls">
@@ -252,64 +259,92 @@
                 <button class="filter-btn active" data-filter="all">الكل</button>
                 <button class="filter-btn" data-filter="image">صور</button>
                 <button class="filter-btn" data-filter="video">فيديو</button>
-                <button class="filter-btn" data-filter="document">ملفات</button>
+                <button class="filter-btn" data-filter="document">مستندات</button>
             </div>
         </div>
 
         <div id="galleryContainer" class="gallery-grid">
             <div class="loading">
                 <div class="loader"></div>
-                <p>جاري الاتصال بقاعدة البيانات...</p>
+                <p>جاري جلب الملفات من السيرفر...</p>
             </div>
         </div>
     </div>
 
     <script>
-        let allFiles = []; // لتخزين الملفات محلياً للبحث السريع
+        let allFiles = []; // المخزن المحلي
 
-        // دالة لجلب الملفات عند التحميل
+        // التشغيل عند التحميل
         window.addEventListener('load', async () => {
+            await loadFiles();
+        });
+
+        // 1. جلب الملفات من المسار الصحيح
+        async function loadFiles() {
             try {
-                // ملاحظة: نستخدم المسار الذي برمجناه في server.js
+                // هذا هو المسار الموجود في server.js V3
                 const response = await fetch('/files');
-                allFiles = await response.json();
+                const result = await response.json();
+
+                // التحقق من صحة البيانات
+                if (Array.isArray(result)) {
+                    allFiles = result;
+                } else if (result.success && result.files) {
+                    allFiles = result.files;
+                } else {
+                    allFiles = [];
+                }
+
+                updateStats();
                 renderGallery(allFiles);
+
             } catch (error) {
                 document.getElementById('galleryContainer').innerHTML = `
-                    <div style="text-align:center; color:white; grid-column: 1/-1;">
-                        <h2>😕 حدث خطأ</h2>
+                    <div class="empty-state">
+                        <div style="font-size: 40px">⚠️</div>
+                        <h3>فشل الاتصال</h3>
                         <p>${error.message}</p>
+                        <button class="btn btn-view" onclick="location.reload()" style="max-width:150px; margin:20px auto;">إعادة المحاولة</button>
                     </div>
                 `;
             }
-        });
+        }
 
-        // دالة رسم المعرض
+        // 2. تحديث الإحصائيات محلياً (بدون سيرفر)
+        function updateStats() {
+            const totalCount = allFiles.length;
+            const totalSize = allFiles.reduce((acc, curr) => acc + (curr.file_size || 0), 0);
+            const types = new Set(allFiles.map(f => f.file_type ? f.file_type.split('/')[0] : 'other')).size;
+
+            document.getElementById('statCount').textContent = totalCount;
+            document.getElementById('statSize').textContent = formatBytes(totalSize);
+            document.getElementById('statTypes').textContent = types;
+        }
+
+        // 3. رسم المعرض
         function renderGallery(files) {
             const container = document.getElementById('galleryContainer');
             container.innerHTML = '';
 
             if (files.length === 0) {
                 container.innerHTML = `
-                    <div style="text-align:center; color:white; grid-column: 1/-1; padding: 50px;">
-                        <div style="font-size: 50px; margin-bottom: 20px;">📭</div>
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
                         <h3>المعرض فارغ</h3>
-                        <p>ابدأ برفع الملفات لتظهر هنا</p>
+                        <p>لا توجد ملفات مطابقة للبحث</p>
                     </div>
                 `;
                 return;
             }
 
             files.forEach(file => {
-                // إنشاء رابط العرض باستخدام الجسر الذكي
-                // نستخدم telegram_file_id الذي حفظناه في قاعدة البيانات
+                // استخدام الجسر الذكي للعرض
                 const proxyLink = `/view/${file.telegram_file_id}`;
                 const isImage = file.file_type && file.file_type.includes('image');
                 
-                // تحديد الأيقونة حسب النوع
                 let icon = '📄';
-                if (file.file_type.includes('video')) icon = '🎥';
-                if (file.file_type.includes('audio')) icon = '🎵';
+                if (file.file_type?.includes('video')) icon = '🎥';
+                if (file.file_type?.includes('audio')) icon = '🎵';
 
                 const html = `
                     <div class="file-card">
@@ -330,8 +365,8 @@
                             </div>
 
                             <div class="actions">
-                                <a href="${proxyLink}" target="_blank" class="btn btn-view">👁️ مشاهدة</a>
-                                <a href="${proxyLink}" download="${file.file_name}" class="btn btn-download">⬇️ تحميل</a>
+                                <a href="${proxyLink}" target="_blank" class="btn btn-view">👁️ عرض</a>
+                                <a href="${proxyLink}" download="${file.file_name}" class="btn btn-dl">⬇️ تحميل</a>
                             </div>
                         </div>
                     </div>
@@ -340,11 +375,10 @@
             });
         }
 
-        // منطق البحث والفلترة
+        // 4. البحث والفلترة (Client Side)
         const searchInput = document.getElementById('searchInput');
         const filterBtns = document.querySelectorAll('.filter-btn');
 
-        // البحث الفوري
         searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             const filtered = allFiles.filter(file => 
@@ -354,14 +388,12 @@
             renderGallery(filtered);
         });
 
-        // أزرار الفلترة
         filterBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                // تحديث الأزرار النشطة
                 filterBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-
                 const type = btn.dataset.filter;
+                
                 if (type === 'all') {
                     renderGallery(allFiles);
                 } else {
@@ -371,13 +403,13 @@
             });
         });
 
+        // تنسيق الحجم
         function formatBytes(bytes, decimals = 2) {
             if (!+bytes) return '0 Bytes';
             const k = 1024;
-            const dm = decimals < 0 ? 0 : decimals;
             const sizes = ['Bytes', 'KB', 'MB', 'GB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(decimals))} ${sizes[i]}`;
         }
     </script>
 </body>
