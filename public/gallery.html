@@ -3,8 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🖼️ معرض الملفات - Telegram File Manager</title>
+    <title>📂 معرض الملفات - MoTech Cloud</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            /* ألوان مستوحاة من صورة MoTech */
+            --primary: #00d4ff;
+            --secondary: #a855f7;
+            --accent: #06b6d4;
+            --dark: #0f172a;
+            --darker: #020617;
+            --glass: rgba(15, 23, 42, 0.85);
+            --glass-light: rgba(255, 255, 255, 0.05);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --glow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,10 +26,47 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Tajawal', sans-serif;
+            background: var(--darker);
             min-height: 100vh;
             padding: 20px;
+            color: #fff;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* خلفية MoTech الضبابية */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://files.manuscdn.com/user_upload_by_module/session_file/310419663030263150/PZGumcJnDdDnCtqE.jpg') center/cover no-repeat fixed;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        /* تأثير شبكة تقنية */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: grid-move 20s linear infinite;
+        }
+
+        @keyframes grid-move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
         }
 
         .container {
@@ -23,58 +74,89 @@
             margin: 0 auto;
         }
 
+        /* الهيدر */
         .header {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            background: var(--glass);
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            animation: slideDown 0.6s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 2.2rem;
+            font-weight: 800;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
         }
 
         .subtitle {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.05rem;
+            margin-bottom: 25px;
         }
 
+        /* الإحصائيات */
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
-            margin-top: 20px;
+            margin-top: 25px;
         }
 
         .stat-card {
-            background: #f8f9ff;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
+            background: var(--glass-light);
+            padding: 20px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            transition: all 0.3s;
         }
 
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 5px;
+        .stat-card:hover {
+            background: rgba(0, 212, 255, 0.05);
+            box-shadow: var(--glow);
+            transform: translateY(-3px);
         }
 
         .stat-label {
-            font-size: 14px;
-            color: #666;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
         }
 
+        .stat-value {
+            color: var(--primary);
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        /* أدوات التحكم */
         .controls {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            background: var(--glass);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .control-row {
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
@@ -86,289 +168,521 @@
             min-width: 250px;
         }
 
-        .search-box input {
+        .search-input {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 14px;
+            padding: 14px 20px;
+            border: 2px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            background: var(--glass-light);
+            color: #fff;
+            outline: none;
             transition: all 0.3s;
         }
 
-        .search-box input:focus {
-            outline: none;
-            border-color: #667eea;
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
         }
 
-        .filter-buttons {
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .sort-box {
+            min-width: 200px;
+        }
+
+        .sort-select {
+            width: 100%;
+            padding: 14px 20px;
+            border: 2px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            background: var(--glass-light);
+            color: #fff;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .sort-select:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .sort-select option {
+            background: var(--dark);
+            color: #fff;
+        }
+
+        /* الفلاتر */
+        .filters {
             display: flex;
-            gap: 10px;
+            gap: 12px;
+            margin-top: 20px;
             flex-wrap: wrap;
         }
 
         .filter-btn {
-            padding: 10px 20px;
-            border: 2px solid #e0e0e0;
-            background: white;
-            border-radius: 10px;
+            padding: 12px 24px;
+            border: 2px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            background: var(--glass-light);
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 14px;
         }
 
         .filter-btn:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
+            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
         .filter-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             border-color: transparent;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
         }
 
-        .gallery {
+        /* شبكة الملفات */
+        .files-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .file-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-            animation: fadeIn 0.5s ease;
+            animation: fadeIn 0.8s ease;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .file-card {
+            background: var(--glass);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            transition: all 0.3s;
+            animation: scaleIn 0.4s ease;
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .file-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6);
+            border-color: var(--primary);
+            background: rgba(15, 23, 42, 0.95);
         }
 
         .file-icon {
-            height: 150px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 60px;
-            background: linear-gradient(135deg, #f8f9ff 0%, #e8ebff 100%);
-        }
-
-        .file-info {
-            padding: 15px;
+            font-size: 48px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.3));
         }
 
         .file-name {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 8px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 12px;
             word-break: break-word;
-            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .file-desc {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            max-height: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .file-meta {
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .file-meta-item {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+        }
+
+        .file-meta-value {
+            color: var(--primary);
+            font-weight: 600;
         }
 
         .file-actions {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
         }
 
-        .btn {
+        .file-btn {
             flex: 1;
-            padding: 8px;
+            padding: 12px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 13px;
             transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .btn-view {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(0, 212, 255, 0.3);
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        .btn-view:hover {
+            background: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
         }
 
-        .btn-danger {
-            background: #dc3545;
-            color: white;
+        .btn-download {
+            background: rgba(168, 85, 247, 0.1);
+            color: var(--secondary);
+            border: 1px solid rgba(168, 85, 247, 0.3);
         }
 
-        .btn-danger:hover {
-            background: #c82333;
-            transform: translateY(-2px);
+        .btn-download:hover {
+            background: rgba(168, 85, 247, 0.2);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
         }
 
-        .loading {
-            text-align: center;
-            padding: 50px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.2);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
+        /* رسالة فارغة */
         .empty-state {
             text-align: center;
             padding: 80px 20px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            color: rgba(255, 255, 255, 0.5);
         }
 
         .empty-icon {
             font-size: 80px;
             margin-bottom: 20px;
+            opacity: 0.5;
         }
 
         .empty-text {
-            color: #666;
-            font-size: 18px;
-            margin-bottom: 20px;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
         }
 
-        .back-link {
+        /* زر العودة */
+        .back-btn {
             display: inline-block;
-            margin-bottom: 20px;
-            padding: 10px 20px;
-            background: white;
-            color: #667eea;
+            padding: 14px 30px;
+            background: var(--glass);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            color: var(--primary);
             text-decoration: none;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            font-weight: 600;
+            margin-top: 25px;
             transition: all 0.3s;
+            backdrop-filter: blur(20px);
         }
 
-        .back-link:hover {
+        .back-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            box-shadow: var(--glow);
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
 
-        .error-message {
-            background: #f8d7da;
-            border: 2px solid #f5c6cb;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .files-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
         }
 
         @media (max-width: 768px) {
-            .gallery {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 15px;
+            body {
+                padding: 15px;
+            }
+
+            .header {
+                padding: 25px 20px;
+                border-radius: 16px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .subtitle {
+                font-size: 0.95rem;
+            }
+
+            .stats {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
             }
 
             .controls {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .control-row {
                 flex-direction: column;
-                align-items: stretch;
             }
 
-            .search-box {
-                min-width: 100%;
+            .search-box, .sort-box {
+                width: 100%;
+                min-width: unset;
             }
 
-            .filter-buttons {
-                justify-content: center;
+            .filters {
+                gap: 10px;
+            }
+
+            .filter-btn {
+                padding: 10px 18px;
+                font-size: 0.9rem;
+            }
+
+            .files-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .file-card {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 12px;
+            }
+
+            .stat-label {
+                font-size: 0.8rem;
+            }
+
+            .stat-value {
+                font-size: 1.3rem;
+            }
+
+            .controls {
+                padding: 15px;
+            }
+
+            .search-input, .sort-select {
+                padding: 12px 16px;
+                font-size: 0.95rem;
+            }
+
+            .filters {
+                gap: 8px;
+            }
+
+            .filter-btn {
+                padding: 9px 16px;
+                font-size: 0.85rem;
+            }
+
+            .file-card {
+                padding: 18px;
+            }
+
+            .file-icon {
+                font-size: 42px;
+            }
+
+            .file-name {
+                font-size: 1rem;
+            }
+
+            .file-desc {
+                font-size: 0.85rem;
+            }
+
+            .file-meta {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .file-actions {
+                flex-direction: column;
+            }
+
+            .file-btn {
+                padding: 11px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .header {
+                padding: 18px 12px;
+            }
+
+            h1 {
+                font-size: 1.3rem;
+            }
+
+            .stats {
+                gap: 8px;
+            }
+
+            .stat-card {
+                padding: 10px;
+            }
+
+            .file-card {
+                padding: 15px;
+            }
+        }
+
+        /* تحسينات للأجهزة اللوحية */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .files-grid {
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            }
+
+            .header {
+                padding: 30px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* تحسينات للشاشات الكبيرة */
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 1600px;
+            }
+
+            .files-grid {
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <a href="/" class="back-link">← العودة للرفع</a>
-
         <div class="header">
-            <h1>🖼️ معرض الملفات</h1>
-            <p class="subtitle">جميع الملفات المرفوعة إلى تيليجرام</p>
-
-            <div class="stats" id="stats">
+            <h1>📂 معرض الملفات</h1>
+            <p class="subtitle">جميع ملفاتك في مكان واحد - مدعوم بتقنية MoTech Cloud</p>
+            
+            <div class="stats">
                 <div class="stat-card">
-                    <div class="stat-value" id="totalFiles">-</div>
-                    <div class="stat-label">إجمالي الملفات</div>
+                    <div class="stat-label">📊 إجمالي الملفات</div>
+                    <div class="stat-value" id="totalFiles">0</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="totalSize">-</div>
-                    <div class="stat-label">الحجم الكلي</div>
+                    <div class="stat-label">💾 الحجم الكلي</div>
+                    <div class="stat-value" id="totalSize">0 MB</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="fileTypes">-</div>
-                    <div class="stat-label">أنواع الملفات</div>
+                    <div class="stat-label">📁 أنواع الملفات</div>
+                    <div class="stat-value" id="fileTypes">0</div>
                 </div>
             </div>
         </div>
 
         <div class="controls">
-            <div class="search-box">
-                <input 
-                    type="text" 
-                    id="searchInput" 
-                    placeholder="🔍 ابحث عن ملف..."
-                    autocomplete="off"
-                >
+            <div class="control-row">
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="search-input" 
+                        placeholder="🔍 ابحث عن ملف..."
+                    >
+                </div>
+                <div class="sort-box">
+                    <select id="sortSelect" class="sort-select">
+                        <option value="date-desc">🔄 فرز حسب: الأحدث أولاً</option>
+                        <option value="date-asc">⬆️ الأقدم أولاً</option>
+                        <option value="name-asc">🔤 الاسم (أ-ي)</option>
+                        <option value="name-desc">🔥 الاسم (ي-أ)</option>
+                        <option value="size-desc">📈 الأكبر حجماً</option>
+                        <option value="size-asc">📉 الأصغر حجماً</option>
+                    </select>
+                </div>
             </div>
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-type="all">الكل</button>
-                <button class="filter-btn" data-type="image">📷 صور</button>
+
+            <div class="filters">
+                <button class="filter-btn active" data-type="all">📦 الكل</button>
+                <button class="filter-btn" data-type="image">🖼️ صور</button>
                 <button class="filter-btn" data-type="video">🎥 فيديو</button>
                 <button class="filter-btn" data-type="audio">🎵 صوت</button>
                 <button class="filter-btn" data-type="document">📄 مستندات</button>
             </div>
         </div>
 
-        <div class="controls" style="margin-top: 15px;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <label style="font-weight: bold; color: #4a5568;">🔄 فرز حسب:</label>
-                <select id="sortSelect" style="padding: 10px 15px; border: 2px solid #cbd5e0; border-radius: 10px; font-size: 0.95rem; cursor: pointer; background: white;">
-                    <option value="date-desc">⬇️ الأحدث أولاً</option>
-                    <option value="date-asc">⬆️ الأقدم أولاً</option>
-                    <option value="name-asc">🔤 الاسم (أ-ي)</option>
-                    <option value="name-desc">🔥 الاسم (ي-أ)</option>
-                    <option value="size-desc">📈 الأكبر حجماً</option>
-                    <option value="size-asc">📉 الأصغر حجماً</option>
-                </select>
-            </div>
+        <div class="files-grid" id="filesGrid">
+            <!-- الملفات ستُضاف هنا -->
         </div>
 
-        <div id="content">
-            <div class="loading">
-                <div class="loading-spinner"></div>
-                <p>جاري تحميل الملفات...</p>
-            </div>
+        <div style="text-align: center;">
+            <a href="/" class="back-btn">🏠 العودة للرئيسية</a>
         </div>
     </div>
 
@@ -398,7 +712,7 @@
 
                 if (result.success) {
                     allFiles = result.files;
-                    filterFiles(currentFilter); // استخدام filterFiles بدلاً من displayFiles لتطبيق الفرز
+                    filterFiles(currentFilter);
                     updateStats(result.total);
                 } else {
                     showError('فشل تحميل الملفات: ' + result.error);
@@ -426,75 +740,59 @@
 
         // عرض الملفات
         function displayFiles(files) {
-            const content = document.getElementById('content');
-
-            if (!files || files.length === 0) {
-                content.innerHTML = `
+            const grid = document.getElementById('filesGrid');
+            
+            if (files.length === 0) {
+                grid.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">📭</div>
-                        <div class="empty-text">لا توجد ملفات بعد</div>
-                        <a href="/" class="btn btn-primary" style="max-width: 200px; margin: 0 auto;">ارفع أول ملف</a>
+                        <div class="empty-text">لا توجد ملفات</div>
+                        <p style="color: rgba(255,255,255,0.4);">ابدأ برفع ملفاتك الآن!</p>
                     </div>
                 `;
                 return;
             }
 
-            const gallery = document.createElement('div');
-            gallery.className = 'gallery';
-
-            files.forEach(file => {
-                const card = createFileCard(file);
-                gallery.appendChild(card);
-            });
-
-            content.innerHTML = '';
-            content.appendChild(gallery);
-        }
-
-        // إنشاء بطاقة ملف
-        function createFileCard(file) {
-            const card = document.createElement('div');
-            card.className = 'file-card';
-            card.dataset.type = file.file_type;
-
-            const icon = getFileIcon(file.file_type);
-            const date = new Date(file.created_at).toLocaleDateString('ar-SA');
-
-            // إضافة الوصف إن وجد
-            let descriptionHTML = '';
-            if (file.description && file.description.trim() !== '') {
-                descriptionHTML = `<div class="file-meta" style="color: #667eea; font-style: italic; margin-top: 5px;">📝 ${escapeHtml(file.description)}</div>`;
-            }
-            
-            card.innerHTML = `
-                <div class="file-icon">${icon}</div>
-                <div class="file-info">
+            grid.innerHTML = files.map(file => `
+                <div class="file-card">
+                    <div class="file-icon">${getFileIcon(file.file_type)}</div>
                     <div class="file-name">${escapeHtml(file.file_name)}</div>
-                    <div class="file-meta">📊 ${formatBytes(file.file_size)}</div>
-                    <div class="file-meta">📅 ${date}</div>
-                    ${descriptionHTML}
+                    ${file.description ? `<div class="file-desc">${escapeHtml(file.description)}</div>` : ''}
+                    <div class="file-meta">
+                        <div class="file-meta-item">
+                            📊 <span class="file-meta-value">${formatBytes(file.file_size)}</span>
+                        </div>
+                        <div class="file-meta-item">
+                            📅 <span class="file-meta-value">${formatDate(file.created_at)}</span>
+                        </div>
+                    </div>
                     <div class="file-actions">
-                        <a href="/view/${file.id}" target="_blank" class="btn btn-primary" style="flex: 1;">👁️ مشاهدة</a>
-                        <a href="/download/${file.id}" class="btn btn-primary" style="flex: 1; background: #28a745;">⬇️ تحميل</a>
-                        <button class="btn btn-danger" style="flex: 0.7;" onclick="deleteFile(${file.id}, '${escapeHtml(file.file_name)}')\">🗑️</button>
+                        <button class="file-btn btn-view" onclick="viewFile(${file.id})">👁️ مشاهدة</button>
+                        <button class="file-btn btn-download" onclick="downloadFile(${file.id})">⬇️ تحميل</button>
+                        <button class="file-btn btn-delete" onclick="deleteFile(${file.id})">🗑️ حذف</button>
                     </div>
                 </div>
-            `;
+            `).join('');
+        }
 
-            return card;
+        // مشاهدة ملف
+        function viewFile(id) {
+            window.open(`/view/${id}`, '_blank');
+        }
+
+        // تحميل ملف
+        function downloadFile(id) {
+            window.open(`/download/${id}`, '_blank');
         }
 
         // حذف ملف
-        async function deleteFile(fileId, fileName) {
-            if (!confirm(`هل أنت متأكد من حذف "${fileName}"؟`)) {
+        async function deleteFile(id) {
+            if (!confirm('⚠️ هل أنت متأكد من حذف هذا الملف؟\n\nسيتم حذفه من قاعدة البيانات وتيليجرام نهائياً.')) {
                 return;
             }
 
             try {
-                const response = await fetch(`/api/files/${fileId}`, {
-                    method: 'DELETE'
-                });
-
+                const response = await fetch(`/api/files/${id}`, { method: 'DELETE' });
                 const result = await response.json();
 
                 if (result.success) {
@@ -597,11 +895,25 @@
         }
 
         function formatBytes(bytes) {
-            if (bytes === 0) return '0 Bytes';
+            if (bytes === 0) return '0 بايت';
             const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const sizes = ['بايت', 'كيلوبايت', 'ميجابايت', 'جيجابايت'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            if (days === 0) return 'اليوم';
+            if (days === 1) return 'أمس';
+            if (days < 7) return `منذ ${days} أيام`;
+            if (days < 30) return `منذ ${Math.floor(days / 7)} أسابيع`;
+            if (days < 365) return `منذ ${Math.floor(days / 30)} شهور`;
+            return `منذ ${Math.floor(days / 365)} سنوات`;
         }
 
         function updateStats(total) {
@@ -615,17 +927,7 @@
         }
 
         function showError(message) {
-            const content = document.getElementById('content');
-            content.innerHTML = `
-                <div class="error-message">
-                    <strong>❌ خطأ:</strong> ${message}
-                </div>
-                <div class="empty-state">
-                    <div class="empty-icon">⚠️</div>
-                    <div class="empty-text">حدث خطأ في تحميل الملفات</div>
-                    <button class="btn btn-primary" onclick="location.reload()">إعادة المحاولة</button>
-                </div>
-            `;
+            alert(message);
         }
     </script>
 </body>
