@@ -428,6 +428,12 @@
             box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
         }
 
+        #newFileBtn:hover {
+            background: rgba(16, 185, 129, 0.2) !important;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            transform: translateY(-2px);
+        }
+
         /* زر المعرض */
         .gallery-link {
             display: block;
@@ -665,6 +671,10 @@
                     ⬇️ تحميل
                 </button>
             </div>
+
+            <button type="button" class="action-btn" id="newFileBtn" style="display: none; margin-top: 15px; background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
+                📎 رفع ملف آخر
+            </button>
         </form>
 
         <a href="/gallery" class="gallery-link">
@@ -792,7 +802,12 @@
                             uploadedFileId = result.file.id;
                             showMessage('✅ تم رفع الملف بنجاح!', 'success');
                             actionButtons.style.display = 'flex';
-                            resetForm();
+                            document.getElementById('newFileBtn').style.display = 'block';
+                            // لا نخفي معلومات الملف بعد الرفع
+                            document.getElementById('descInput').value = '';
+                            renameCheckbox.checked = false;
+                            renameWrapper.classList.remove('active');
+                            uploadBtn.style.display = 'none';
                         } else {
                             showMessage('❌ فشل الرفع: ' + result.error, 'error');
                         }
@@ -837,6 +852,12 @@
             }
         });
 
+        document.getElementById('newFileBtn').addEventListener('click', () => {
+            resetForm();
+            uploadBtn.style.display = 'block';
+            document.getElementById('newFileBtn').style.display = 'none';
+        });
+
         // دوال مساعدة
         function formatBytes(bytes) {
             if (bytes === 0) return '0 بايت';
@@ -858,10 +879,13 @@
         function resetForm() {
             selectedFile = null;
             fileInput.value = '';
+            fileInfo.classList.remove('active');
             document.getElementById('descInput').value = '';
             renameCheckbox.checked = false;
             renameWrapper.classList.remove('active');
             renameInput.value = '';
+            actionButtons.style.display = 'none';
+            hideMessage();
         }
     </script>
 </body>
