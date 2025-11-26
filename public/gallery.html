@@ -438,15 +438,23 @@
             const icon = getFileIcon(file.file_type);
             const date = new Date(file.created_at).toLocaleDateString('ar-SA');
 
+            // إضافة الوصف إن وجد
+            let descriptionHTML = '';
+            if (file.description && file.description.trim() !== '') {
+                descriptionHTML = `<div class="file-meta" style="color: #667eea; font-style: italic; margin-top: 5px;">📝 ${escapeHtml(file.description)}</div>`;
+            }
+            
             card.innerHTML = `
                 <div class="file-icon">${icon}</div>
                 <div class="file-info">
                     <div class="file-name">${escapeHtml(file.file_name)}</div>
                     <div class="file-meta">📊 ${formatBytes(file.file_size)}</div>
                     <div class="file-meta">📅 ${date}</div>
+                    ${descriptionHTML}
                     <div class="file-actions">
-                        <a href="${file.telegram_url}" target="_blank" class="btn btn-primary">فتح</a>
-                        <button class="btn btn-danger" onclick="deleteFile(${file.id}, '${escapeHtml(file.file_name)}')">حذف</button>
+                        <a href="/view/${file.id}" target="_blank" class="btn btn-primary" style="flex: 1;">👁️ مشاهدة</a>
+                        <a href="/download/${file.id}" class="btn btn-primary" style="flex: 1; background: #28a745;">⬇️ تحميل</a>
+                        <button class="btn btn-danger" style="flex: 0.7;" onclick="deleteFile(${file.id}, '${escapeHtml(file.file_name)}')\">🗑️</button>
                     </div>
                 </div>
             `;

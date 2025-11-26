@@ -148,6 +148,33 @@ async function deleteFile(fileId) {
 }
 
 /**
+ * الحصول على ملف بواسطة ID
+ */
+async function getFileById(fileId) {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('files')
+      .select('*')
+      .eq('id', fileId)
+      .single();
+
+    if (error) {
+      console.error('❌ خطأ في جلب الملف:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ خطأ غير متوقع:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
  * الحصول على إحصائيات الملفات
  */
 async function getStats() {
@@ -196,6 +223,7 @@ module.exports = {
   getAllFiles,
   searchFiles,
   deleteFile,
+  getFileById,
   getStats,
   getFileType,
   isConfigured: () => supabase !== null

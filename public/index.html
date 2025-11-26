@@ -317,12 +317,30 @@
                 if (response.ok) {
                     statusMsg.className = 'status success show';
                     statusMsg.style.display = 'block';
-                    // هنا تظهر أزرار العرض والتحميل الجديدة
+                    
+                    // عرض أزرار المشاهدة والتحميل مع الرابط المباشر
+                    const dbId = result.db_id;
+                    let actionsHTML = '';
+                    
+                    if (dbId) {
+                        actionsHTML = `
+                            <div class="result-actions">
+                                <a href="/view/${dbId}" target="_blank" class="action-btn btn-view">👁️ مشاهدة</a>
+                                <a href="/download/${dbId}" class="action-btn btn-dl">⬇️ تحميل</a>
+                                <a href="/gallery" class="action-btn btn-view">📂 المعرض</a>
+                            </div>
+                        `;
+                    } else {
+                        actionsHTML = `
+                            <div class="result-actions">
+                                <a href="/gallery" class="action-btn btn-view">📂 المعرض</a>
+                            </div>
+                        `;
+                    }
+                    
                     statusMsg.innerHTML = `
                         ✅ <strong>تم الرفع بنجاح!</strong><br>
-                        <div class="result-actions">
-                            <a href="/gallery" class="action-btn btn-view">📂 المعرض</a>
-                        </div>
+                        ${actionsHTML}
                     `;
                     form.reset();
                     fileInfo.classList.remove('show');
