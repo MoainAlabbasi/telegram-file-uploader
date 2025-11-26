@@ -213,6 +213,15 @@
                 <input type="text" id="descInput" name="description" class="desc-input" placeholder="📝 أضف وصفاً للملف (اختياري)...">
             </div>
 
+            <div class="input-group" style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="renameCheckbox" style="width: auto; cursor: pointer;">
+                <label for="renameCheckbox" style="cursor: pointer; margin: 0;">⚙️ إعادة تسمية الملف</label>
+            </div>
+
+            <div class="input-group" id="renameInputGroup" style="display: none;">
+                <input type="text" id="renameInput" class="desc-input" placeholder="📝 اسم الملف الجديد (مع الامتداد)...">
+            </div>
+
             <button type="submit" class="btn-upload" id="uploadBtn" disabled>📤 رفع الملف</button>
         </form>
 
@@ -242,6 +251,24 @@
         const statusMsg = document.getElementById('statusMessage');
         const progressContainer = document.getElementById('progressContainer');
         const progressBar = document.getElementById('progressBar');
+
+        // إعادة التسمية
+        const renameCheckbox = document.getElementById('renameCheckbox');
+        const renameInputGroup = document.getElementById('renameInputGroup');
+        const renameInput = document.getElementById('renameInput');
+
+        renameCheckbox.addEventListener('change', () => {
+            if (renameCheckbox.checked) {
+                renameInputGroup.style.display = 'block';
+                // ملء الحقل باسم الملف الحالي
+                if (fileInput.files.length > 0) {
+                    renameInput.value = fileInput.files[0].name;
+                }
+            } else {
+                renameInputGroup.style.display = 'none';
+                renameInput.value = '';
+            }
+        });
 
         // التعامل مع اختيار الملف
         uploadArea.addEventListener('click', () => fileInput.click());
@@ -278,6 +305,11 @@
                 fileInfo.classList.add('show');
                 uploadBtn.disabled = false;
                 statusMsg.style.display = 'none';
+                
+                // إذا كان خيار إعادة التسمية مفعّل، ملء الحقل
+                if (renameCheckbox.checked) {
+                    renameInput.value = file.name;
+                }
             }
         }
 
@@ -286,7 +318,21 @@
             e.preventDefault();
             if (!fileInput.files.length) return;
 
-            const formData = new FormData(form);
+            // إنشاء FormData مع دعم إعادة التسمية
+            const formData = new FormData();
+            
+            // الملف (مع إعادة التسمية إن وجدت)
+            const originalFile = fileInput.files[0];
+            let fileToUpload = originalFile;
+            
+            if (renameCheckbox.checked && renameInput.value.trim() !== '') {
+                // إعادة تسمية الملف
+                const newFileName = renameInput.value.trim();
+                fileToUpload = new File([originalFile], newFileName, { type: originalFile.type });
+            }
+            
+            formData.append('file', fileToUpload);
+            formData.append('description', document.getElementById('descInput').value);
             
             // UI Updates
             uploadBtn.disabled = true;

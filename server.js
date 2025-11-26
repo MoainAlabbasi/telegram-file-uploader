@@ -129,8 +129,17 @@ app.get('/view/:id', async (req, res) => {
     const filePath = fileInfo.result.file_path;
     const directUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${filePath}`;
     
-    // إعادة توجيه المستخدم إلى الملف
-    res.redirect(directUrl);
+    // تحميل الملف من تيليجرام وإرساله مع headers صحيحة للعرض المباشر
+    const fileResponse = await fetch(directUrl);
+    const fileBuffer = await fileResponse.buffer();
+    
+    // تحديد Content-Type بناءً على نوع الملف
+    const mimeType = fileData.mime_type || 'application/octet-stream';
+    
+    // إرسال الملف للعرض المباشر في المتصفح (inline بدلاً من attachment)
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader('Content-Disposition', 'inline');
+    res.send(fileBuffer);
     
   } catch (error) {
     console.error('❌ خطأ في عرض الملف:', error.message);
@@ -175,8 +184,9 @@ app.get('/download/:id', async (req, res) => {
     const fileResponse = await fetch(directUrl);
     const fileBuffer = await fileResponse.buffer();
     
-    // إرسال الملف للمستخدم مع اسم الملف الأصلي
-    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileData.file_name)}"`);
+    // إرسال الملف للمستخدم مع اسم الملف الأصلي (دعم العربية)
+    const encodedFilename = encodeURIComponent(fileData.file_name);
+    res.setHeader('Content-Disposition', `attachment; filename="${fileData.file_name}"; filename*=UTF-8''${encodedFilename}`);
     res.setHeader('Content-Type', fileData.mime_type || 'application/octet-stream');
     res.send(fileBuffer);
     

@@ -350,6 +350,20 @@
             </div>
         </div>
 
+        <div class="controls" style="margin-top: 15px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <label style="font-weight: bold; color: #4a5568;">🔄 فرز حسب:</label>
+                <select id="sortSelect" style="padding: 10px 15px; border: 2px solid #cbd5e0; border-radius: 10px; font-size: 0.95rem; cursor: pointer; background: white;">
+                    <option value="date-desc">⬇️ الأحدث أولاً</option>
+                    <option value="date-asc">⬆️ الأقدم أولاً</option>
+                    <option value="name-asc">🔤 الاسم (أ-ي)</option>
+                    <option value="name-desc">🔥 الاسم (ي-أ)</option>
+                    <option value="size-desc">📈 الأكبر حجماً</option>
+                    <option value="size-asc">📉 الأصغر حجماً</option>
+                </select>
+            </div>
+        </div>
+
         <div id="content">
             <div class="loading">
                 <div class="loading-spinner"></div>
@@ -361,11 +375,19 @@
     <script>
         let allFiles = [];
         let currentFilter = 'all';
+        let currentSort = 'date-desc';
 
         // تحميل الملفات عند فتح الصفحة
         window.addEventListener('load', async () => {
             await loadFiles();
             await loadStats();
+        });
+
+        // الفرز
+        const sortSelect = document.getElementById('sortSelect');
+        sortSelect.addEventListener('change', () => {
+            currentSort = sortSelect.value;
+            filterFiles(currentFilter);
         });
 
         // تحميل الملفات من API
@@ -376,7 +398,7 @@
 
                 if (result.success) {
                     allFiles = result.files;
-                    displayFiles(allFiles);
+                    filterFiles(currentFilter); // استخدام filterFiles بدلاً من displayFiles لتطبيق الفرز
                     updateStats(result.total);
                 } else {
                     showError('فشل تحميل الملفات: ' + result.error);
@@ -510,7 +532,8 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    displayFiles(result.files);
+                    const sorted = sortFiles(result.files, currentSort);
+                    displayFiles(sorted);
                 } else {
                     showError('فشل البحث: ' + result.error);
                 }
@@ -532,11 +555,33 @@
         });
 
         function filterFiles(type) {
-            if (type === 'all') {
-                displayFiles(allFiles);
-            } else {
-                const filtered = allFiles.filter(f => f.file_type === type);
-                displayFiles(filtered);
+            let filtered = type === 'all' ? [...allFiles] : allFiles.filter(f => f.file_type === type);
+            
+            // تطبيق الفرز
+            filtered = sortFiles(filtered, currentSort);
+            
+            displayFiles(filtered);
+        }
+
+        // دالة الفرز
+        function sortFiles(files, sortType) {
+            const sorted = [...files];
+            
+            switch(sortType) {
+                case 'date-desc':
+                    return sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                case 'date-asc':
+                    return sorted.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                case 'name-asc':
+                    return sorted.sort((a, b) => a.file_name.localeCompare(b.file_name, 'ar'));
+                case 'name-desc':
+                    return sorted.sort((a, b) => b.file_name.localeCompare(a.file_name, 'ar'));
+                case 'size-desc':
+                    return sorted.sort((a, b) => b.file_size - a.file_size);
+                case 'size-asc':
+                    return sorted.sort((a, b) => a.file_size - b.file_size);
+                default:
+                    return sorted;
             }
         }
 
