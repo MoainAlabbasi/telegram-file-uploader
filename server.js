@@ -184,9 +184,10 @@ app.get('/download/:id', async (req, res) => {
     const fileResponse = await fetch(directUrl);
     const fileBuffer = await fileResponse.buffer();
     
-    // إرسال الملف للمستخدم مع اسم الملف الأصلي (دعم العربية)
+    // إرسال الملف للمستخدم مع اسم الملف الأصلي (دعم كامل للعربية)
     const encodedFilename = encodeURIComponent(fileData.file_name);
-    res.setHeader('Content-Disposition', `attachment; filename="${fileData.file_name}"; filename*=UTF-8''${encodedFilename}`);
+    // استخدام filename* فقط لتجنب مشاكل encoding
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodedFilename}`);
     res.setHeader('Content-Type', fileData.mime_type || 'application/octet-stream');
     res.send(fileBuffer);
     

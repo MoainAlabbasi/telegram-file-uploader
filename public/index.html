@@ -7,49 +7,102 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #667eea;
-            --secondary: #764ba2;
-            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --glass: rgba(255, 255, 255, 0.95);
-            --shadow: 0 20px 60px rgba(0,0,0,0.3);
+            /* ألوان مستوحاة من صورة MoTech */
+            --primary: #00d4ff;        /* أزرق سماوي */
+            --secondary: #a855f7;      /* بنفسجي */
+            --accent: #06b6d4;         /* سماوي */
+            --dark: #0f172a;           /* داكن */
+            --darker: #020617;         /* أغمق */
+            --glass: rgba(15, 23, 42, 0.85);
+            --glass-light: rgba(255, 255, 255, 0.05);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --glow: 0 0 30px rgba(0, 212, 255, 0.3);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+        }
 
         body {
             font-family: 'Tajawal', sans-serif;
-            background: var(--bg-gradient);
+            background: var(--darker);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 15px;
-            color: #333;
+            padding: 20px;
+            color: #fff;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        /* الحاوية الرئيسية بتصميم متجاوب */
+        /* خلفية MoTech الضبابية */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('motech-bg-blur.jpg') center/cover no-repeat fixed;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        /* تأثير شبكة تقنية */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: grid-move 20s linear infinite;
+        }
+
+        @keyframes grid-move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* الحاوية الرئيسية */
         .container {
             background: var(--glass);
-            border-radius: 25px;
+            border-radius: 24px;
             box-shadow: var(--shadow);
-            max-width: 550px;
+            max-width: 600px;
             width: 100%;
-            padding: 30px;
-            backdrop-filter: blur(10px);
+            padding: 40px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
             animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
 
-        /* تحسينات للجوال */
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-                border-radius: 20px;
-            }
-            h1 { font-size: 1.4rem !important; }
-            .subtitle { font-size: 0.9rem !important; }
-            .upload-area { padding: 30px 15px !important; }
+        /* تأثير توهج */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+            animation: glow-pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
         }
 
         @keyframes slideUp {
@@ -57,360 +110,758 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .header { text-align: center; margin-bottom: 25px; }
-        h1 { color: #2d3748; margin-bottom: 8px; font-weight: 800; font-size: 1.8rem; }
-        .subtitle { color: #718096; font-size: 1rem; }
+        /* الهيدر */
+        .header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 { 
+            color: var(--primary); 
+            margin-bottom: 10px; 
+            font-weight: 800; 
+            font-size: 2rem;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .subtitle { 
+            color: rgba(255, 255, 255, 0.7); 
+            font-size: 1rem;
+        }
 
         /* منطقة الرفع */
         .upload-area {
-            border: 2px dashed #cbd5e0;
-            border-radius: 18px;
-            padding: 40px 20px;
+            border: 2px dashed rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px 30px;
             text-align: center;
-            background: #f7fafc;
+            background: var(--glass-light);
             transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
+            z-index: 1;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(0, 212, 255, 0.05);
+            box-shadow: var(--glow);
+            transform: translateY(-2px);
         }
 
         .upload-area:active { transform: scale(0.98); }
-        .upload-area.dragover { border-color: var(--secondary); background: #ebf4ff; transform: scale(1.02); }
         
-        .upload-icon { font-size: 48px; margin-bottom: 15px; animation: float 3s ease-in-out infinite; }
+        .upload-area.dragover { 
+            border-color: var(--secondary); 
+            background: rgba(168, 85, 247, 0.1); 
+            transform: scale(1.02); 
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.4);
+        }
+        
+        .upload-icon { 
+            font-size: 64px; 
+            margin-bottom: 20px; 
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5));
+        }
         
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-15px); }
         }
 
-        .upload-text { color: #4a5568; font-weight: 600; margin-bottom: 5px; }
-        .upload-hint { color: #a0aec0; font-size: 0.85rem; }
+        .upload-text { 
+            color: var(--primary); 
+            font-weight: 700; 
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
 
-        /* حقل الوصف الجديد */
-        .input-group { margin-top: 20px; }
-        .desc-input {
+        .upload-hint { 
+            color: rgba(255, 255, 255, 0.5); 
+            font-size: 0.9rem;
+        }
+
+        /* حقول الإدخال */
+        .input-group { 
+            margin-top: 25px; 
+            position: relative;
+            z-index: 1;
+        }
+
+        .desc-input, .rename-input {
             width: 100%;
-            padding: 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
+            padding: 16px;
+            border: 2px solid rgba(0, 212, 255, 0.2);
+            border-radius: 14px;
             font-family: 'Tajawal', sans-serif;
             font-size: 1rem;
             outline: none;
-            transition: 0.3s;
+            transition: all 0.3s;
+            background: var(--glass-light);
+            color: #fff;
         }
-        .desc-input:focus { border-color: var(--primary); background: #fff; }
+
+        .desc-input::placeholder, .rename-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .desc-input:focus, .rename-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        /* خيار إعادة التسمية */
+        .rename-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--glass-light);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .rename-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .rename-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .rename-input-wrapper {
+            margin-top: 15px;
+            display: none;
+        }
+
+        .rename-input-wrapper.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         /* معلومات الملف */
         .file-info {
-            margin-top: 15px;
-            padding: 12px;
-            background: #edf2f7;
-            border-radius: 12px;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 212, 255, 0.05);
+            border-radius: 14px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
             display: none;
-            border-right: 4px solid var(--primary);
         }
-        .file-info.show { display: block; animation: fadeIn 0.3s; }
-        .file-name { font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .file-info.active { 
+            display: block; 
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .file-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+        }
+
+        .file-info-label { 
+            color: var(--primary); 
+            font-weight: 600;
+        }
 
         /* زر الرفع */
-        .btn-upload {
+        .upload-btn {
             width: 100%;
-            background: var(--bg-gradient);
-            color: white;
-            padding: 16px;
+            padding: 18px;
+            margin-top: 25px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #fff;
             border: none;
             border-radius: 14px;
             font-size: 1.1rem;
             font-weight: 700;
-            font-family: 'Tajawal', sans-serif;
             cursor: pointer;
-            margin-top: 25px;
-            transition: 0.3s;
-            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+            position: relative;
+            overflow: hidden;
         }
-        .btn-upload:disabled { background: #cbd5e0; cursor: not-allowed; box-shadow: none; }
-        .btn-upload:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4); }
+
+        .upload-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .upload-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.5);
+        }
+
+        .upload-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .upload-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
 
         /* شريط التقدم */
-        .progress-container {
-            height: 6px;
-            background: #e2e8f0;
-            border-radius: 3px;
-            margin-top: 15px;
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 10px;
+            margin-top: 20px;
             overflow: hidden;
             display: none;
         }
-        .progress-bar {
-            height: 100%;
-            background: var(--bg-gradient);
-            width: 0%;
-            transition: width 0.3s ease;
+
+        .progress-bar.active { 
+            display: block; 
+            animation: fadeIn 0.3s ease;
         }
 
-        /* الحالة */
-        .status { margin-top: 20px; padding: 15px; border-radius: 12px; display: none; font-size: 0.95rem; line-height: 1.5; }
-        .status.success { background: #c6f6d5; color: #22543d; border: 1px solid #9ae6b4; }
-        .status.error { background: #fed7d7; color: #822727; border: 1px solid #feb2b2; }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            transition: width 0.3s;
+            box-shadow: 0 0 10px var(--primary);
+        }
 
-        /* أزرار النتيجة */
-        .result-actions { display: flex; gap: 10px; margin-top: 10px; }
+        /* الرسائل */
+        .message {
+            margin-top: 20px;
+            padding: 18px;
+            border-radius: 14px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .message.active { display: block; }
+
+        .message.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        /* أزرار الإجراءات */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
         .action-btn {
             flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            text-decoration: none;
-            text-align: center;
-            font-weight: bold;
-            font-size: 0.9rem;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Tajawal', sans-serif;
         }
-        .btn-view { background: #fff; color: #333; border: 1px solid #ccc; }
-        .btn-dl { background: #2ecc71; color: white; border: none; }
 
-        /* التذييل MoTech */
-        .footer {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 0.85rem;
-            color: #718096;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 15px;
+        .btn-view {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(0, 212, 255, 0.3);
         }
-        .motech-badge {
-            display: inline-block;
-            background: linear-gradient(90deg, #667eea11, #764ba211);
-            padding: 5px 15px;
-            border-radius: 20px;
+
+        .btn-view:hover {
+            background: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-download {
+            background: rgba(168, 85, 247, 0.1);
             color: var(--secondary);
-            font-weight: 700;
-            margin-top: 5px;
+            border: 1px solid rgba(168, 85, 247, 0.3);
         }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .btn-download:hover {
+            background: rgba(168, 85, 247, 0.2);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+        }
+
+        /* زر المعرض */
+        .gallery-link {
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            padding: 16px;
+            background: var(--glass-light);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 14px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .gallery-link:hover {
+            background: rgba(0, 212, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 25px;
+                border-radius: 20px;
+            }
+
+            h1 { 
+                font-size: 1.6rem; 
+            }
+
+            .subtitle { 
+                font-size: 0.9rem; 
+            }
+
+            .upload-area { 
+                padding: 40px 20px; 
+            }
+
+            .upload-icon { 
+                font-size: 52px; 
+            }
+
+            .upload-text {
+                font-size: 1rem;
+            }
+
+            .upload-hint {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 25px 20px;
+                border-radius: 18px;
+            }
+
+            h1 { 
+                font-size: 1.4rem; 
+            }
+
+            .subtitle { 
+                font-size: 0.85rem; 
+            }
+
+            .upload-area { 
+                padding: 35px 15px; 
+            }
+
+            .upload-icon { 
+                font-size: 48px; 
+            }
+
+            .upload-text {
+                font-size: 0.95rem;
+            }
+
+            .upload-hint {
+                font-size: 0.8rem;
+            }
+
+            .desc-input, .rename-input {
+                padding: 14px;
+                font-size: 0.95rem;
+            }
+
+            .upload-btn {
+                padding: 16px;
+                font-size: 1rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                padding: 12px;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            h1 { 
+                font-size: 1.3rem; 
+            }
+
+            .upload-area { 
+                padding: 30px 12px; 
+            }
+
+            .upload-icon { 
+                font-size: 42px; 
+            }
+        }
+
+        /* تحسينات للأجهزة اللوحية */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .container {
+                max-width: 650px;
+                padding: 45px;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .upload-area {
+                padding: 55px 35px;
+            }
+
+            .upload-icon {
+                font-size: 70px;
+            }
+        }
+
+        /* تحسينات للشاشات الكبيرة */
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 700px;
+                padding: 50px;
+            }
+
+            h1 {
+                font-size: 2.4rem;
+            }
+
+            .upload-area {
+                padding: 60px 40px;
+            }
+
+            .upload-icon {
+                font-size: 76px;
+            }
+        }
     </style>
 </head>
 <body>
-
     <div class="container">
         <div class="header">
-            <h1>🚀 MoTech Cloud</h1>
-            <p class="subtitle">التخزين السحابي الآمن والذكي</p>
+            <h1>☁️ MoTech Cloud</h1>
+            <p class="subtitle">رافع الملفات الذكي - مدعوم بتقنية تيليجرام</p>
         </div>
 
-        <form id="uploadForm">
+        <form id="uploadForm" enctype="multipart/form-data">
             <div class="upload-area" id="uploadArea">
-                <div class="upload-icon">☁️</div>
+                <div class="upload-icon">📤</div>
                 <div class="upload-text">اضغط أو اسحب الملف هنا</div>
-                <div class="upload-hint">صور، فيديو، مستندات (Max: 50MB)</div>
-                <input type="file" id="fileInput" name="file" hidden>
+                <div class="upload-hint">الحد الأقصى: 50 ميجابايت</div>
+                <input type="file" id="fileInput" hidden>
             </div>
 
             <div class="file-info" id="fileInfo">
-                <div class="file-name" id="fileNameName"></div>
-                <div style="font-size: 0.8rem; color: #666;" id="fileSize"></div>
+                <div class="file-info-item">
+                    <span class="file-info-label">📄 اسم الملف:</span>
+                    <span id="fileName">-</span>
+                </div>
+                <div class="file-info-item">
+                    <span class="file-info-label">📊 الحجم:</span>
+                    <span id="fileSize">-</span>
+                </div>
+                <div class="file-info-item">
+                    <span class="file-info-label">📁 النوع:</span>
+                    <span id="fileType">-</span>
+                </div>
             </div>
 
             <div class="input-group">
-                <input type="text" id="descInput" name="description" class="desc-input" placeholder="📝 أضف وصفاً للملف (اختياري)...">
+                <textarea 
+                    id="descInput" 
+                    class="desc-input" 
+                    placeholder="💬 أضف وصفاً للملف (اختياري)..."
+                    rows="3"
+                ></textarea>
             </div>
 
-            <div class="input-group" style="display: flex; align-items: center; gap: 10px;">
-                <input type="checkbox" id="renameCheckbox" style="width: auto; cursor: pointer;">
-                <label for="renameCheckbox" style="cursor: pointer; margin: 0;">⚙️ إعادة تسمية الملف</label>
+            <div class="rename-option">
+                <input type="checkbox" id="renameCheckbox" class="rename-checkbox">
+                <label for="renameCheckbox" class="rename-label">⚙️ إعادة تسمية الملف</label>
             </div>
 
-            <div class="input-group" id="renameInputGroup" style="display: none;">
-                <input type="text" id="renameInput" class="desc-input" placeholder="📝 اسم الملف الجديد (مع الامتداد)...">
+            <div class="rename-input-wrapper" id="renameWrapper">
+                <input 
+                    type="text" 
+                    id="renameInput" 
+                    class="rename-input" 
+                    placeholder="✏️ أدخل الاسم الجديد..."
+                >
             </div>
 
-            <button type="submit" class="btn-upload" id="uploadBtn" disabled>📤 رفع الملف</button>
+            <button type="submit" class="upload-btn" id="uploadBtn">
+                🚀 رفع الملف
+            </button>
+
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="message" id="message"></div>
+
+            <div class="action-buttons" id="actionButtons" style="display: none;">
+                <button type="button" class="action-btn btn-view" id="viewBtn">
+                    👁️ مشاهدة
+                </button>
+                <button type="button" class="action-btn btn-download" id="downloadBtn">
+                    ⬇️ تحميل
+                </button>
+            </div>
         </form>
 
-        <div class="progress-container" id="progressContainer">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-
-        <div class="status" id="statusMessage"></div>
-
-        <div class="footer">
-            <div>
-                <a href="/gallery" style="color: var(--primary); text-decoration: none; font-weight: bold;">📂 المعرض</a>
-            </div>
-            <div style="margin-top: 10px;">
-                تم التطوير بواسطة
-                <div class="motech-badge">MoTech Team 💻</div>
-            </div>
-        </div>
+        <a href="/gallery" class="gallery-link">
+            📂 عرض جميع الملفات
+        </a>
     </div>
 
     <script>
-        const form = document.getElementById('uploadForm');
-        const fileInput = document.getElementById('fileInput');
-        const uploadArea = document.getElementById('uploadArea');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const fileInfo = document.getElementById('fileInfo');
-        const statusMsg = document.getElementById('statusMessage');
-        const progressContainer = document.getElementById('progressContainer');
-        const progressBar = document.getElementById('progressBar');
+        let selectedFile = null;
+        let uploadedFileId = null;
 
-        // إعادة التسمية
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const uploadForm = document.getElementById('uploadForm');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const message = document.getElementById('message');
+        const actionButtons = document.getElementById('actionButtons');
         const renameCheckbox = document.getElementById('renameCheckbox');
-        const renameInputGroup = document.getElementById('renameInputGroup');
+        const renameWrapper = document.getElementById('renameWrapper');
         const renameInput = document.getElementById('renameInput');
 
-        renameCheckbox.addEventListener('change', () => {
-            if (renameCheckbox.checked) {
-                renameInputGroup.style.display = 'block';
-                // ملء الحقل باسم الملف الحالي
-                if (fileInput.files.length > 0) {
-                    renameInput.value = fileInput.files[0].name;
-                }
-            } else {
-                renameInputGroup.style.display = 'none';
-                renameInput.value = '';
-            }
-        });
-
-        // التعامل مع اختيار الملف
+        // فتح نافذة اختيار الملف
         uploadArea.addEventListener('click', () => fileInput.click());
 
-        fileInput.addEventListener('change', handleFileSelect);
-
-        // سحب وإفلات
+        // السحب والإفلات
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
-            uploadArea.style.borderColor = 'var(--secondary)';
-            uploadArea.style.background = '#ebf4ff';
+            uploadArea.classList.add('dragover');
         });
 
         uploadArea.addEventListener('dragleave', () => {
-            uploadArea.style.borderColor = '#cbd5e0';
-            uploadArea.style.background = '#f7fafc';
+            uploadArea.classList.remove('dragover');
         });
 
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            uploadArea.style.borderColor = '#cbd5e0';
-            uploadArea.style.background = '#f7fafc';
-            if (e.dataTransfer.files.length) {
-                fileInput.files = e.dataTransfer.files;
-                handleFileSelect();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) handleFileSelect(file);
+        });
+
+        // اختيار الملف
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) handleFileSelect(file);
+        });
+
+        // معالجة الملف المختار
+        function handleFileSelect(file) {
+            if (file.size > 50 * 1024 * 1024) {
+                showMessage('❌ الملف كبير جداً! الحد الأقصى 50 ميجابايت', 'error');
+                return;
+            }
+
+            selectedFile = file;
+            
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = formatBytes(file.size);
+            document.getElementById('fileType').textContent = file.type || 'غير معروف';
+            
+            fileInfo.classList.add('active');
+            renameInput.value = file.name;
+            
+            hideMessage();
+            actionButtons.style.display = 'none';
+        }
+
+        // خيار إعادة التسمية
+        renameCheckbox.addEventListener('change', () => {
+            if (renameCheckbox.checked) {
+                renameWrapper.classList.add('active');
+                renameInput.focus();
+            } else {
+                renameWrapper.classList.remove('active');
             }
         });
 
-        function handleFileSelect() {
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                document.getElementById('fileNameName').textContent = file.name;
-                document.getElementById('fileSize').textContent = formatBytes(file.size);
-                fileInfo.classList.add('show');
-                uploadBtn.disabled = false;
-                statusMsg.style.display = 'none';
-                
-                // إذا كان خيار إعادة التسمية مفعّل، ملء الحقل
-                if (renameCheckbox.checked) {
-                    renameInput.value = file.name;
-                }
-            }
-        }
-
-        // عملية الرفع
-        form.addEventListener('submit', async (e) => {
+        // رفع الملف
+        uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!fileInput.files.length) return;
 
-            // إنشاء FormData مع دعم إعادة التسمية
+            if (!selectedFile) {
+                showMessage('⚠️ الرجاء اختيار ملف أولاً', 'error');
+                return;
+            }
+
             const formData = new FormData();
             
-            // الملف (مع إعادة التسمية إن وجدت)
-            const originalFile = fileInput.files[0];
-            let fileToUpload = originalFile;
-            
+            // إعادة تسمية الملف إذا كان الخيار مفعلاً
+            let fileToUpload = selectedFile;
             if (renameCheckbox.checked && renameInput.value.trim() !== '') {
-                // إعادة تسمية الملف
                 const newFileName = renameInput.value.trim();
-                fileToUpload = new File([originalFile], newFileName, { type: originalFile.type });
+                fileToUpload = new File([selectedFile], newFileName, { type: selectedFile.type });
             }
             
             formData.append('file', fileToUpload);
-            formData.append('description', document.getElementById('descInput').value);
             
-            // UI Updates
+            const description = document.getElementById('descInput').value.trim();
+            if (description) {
+                formData.append('description', description);
+            }
+
             uploadBtn.disabled = true;
-            uploadBtn.innerHTML = '⏳ جاري الرفع...';
-            progressContainer.style.display = 'block';
-            statusMsg.style.display = 'none';
-            progressBar.style.width = '0%';
+            uploadBtn.textContent = '⏳ جاري الرفع...';
+            progressBar.classList.add('active');
+            hideMessage();
 
             try {
-                // محاكاة شريط التقدم (لأن fetch لا يدعم progress natively بسهولة)
-                let progress = 0;
-                const interval = setInterval(() => {
-                    progress += Math.random() * 10;
-                    if (progress > 90) progress = 90;
-                    progressBar.style.width = `${progress}%`;
-                }, 200);
+                const xhr = new XMLHttpRequest();
 
-                const response = await fetch('/upload', {
-                    method: 'POST',
-                    body: formData
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percent = (e.loaded / e.total) * 100;
+                        progressFill.style.width = percent + '%';
+                    }
                 });
 
-                clearInterval(interval);
-                progressBar.style.width = '100%';
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    statusMsg.className = 'status success show';
-                    statusMsg.style.display = 'block';
-                    
-                    // عرض أزرار المشاهدة والتحميل مع الرابط المباشر
-                    const dbId = result.db_id;
-                    let actionsHTML = '';
-                    
-                    if (dbId) {
-                        actionsHTML = `
-                            <div class="result-actions">
-                                <a href="/view/${dbId}" target="_blank" class="action-btn btn-view">👁️ مشاهدة</a>
-                                <a href="/download/${dbId}" class="action-btn btn-dl">⬇️ تحميل</a>
-                                <a href="/gallery" class="action-btn btn-view">📂 المعرض</a>
-                            </div>
-                        `;
+                xhr.addEventListener('load', () => {
+                    if (xhr.status === 200) {
+                        const result = JSON.parse(xhr.responseText);
+                        if (result.success) {
+                            uploadedFileId = result.file.id;
+                            showMessage('✅ تم رفع الملف بنجاح!', 'success');
+                            actionButtons.style.display = 'flex';
+                            resetForm();
+                        } else {
+                            showMessage('❌ فشل الرفع: ' + result.error, 'error');
+                        }
                     } else {
-                        actionsHTML = `
-                            <div class="result-actions">
-                                <a href="/gallery" class="action-btn btn-view">📂 المعرض</a>
-                            </div>
-                        `;
+                        showMessage('❌ خطأ في الاتصال بالخادم', 'error');
                     }
                     
-                    statusMsg.innerHTML = `
-                        ✅ <strong>تم الرفع بنجاح!</strong><br>
-                        ${actionsHTML}
-                    `;
-                    form.reset();
-                    fileInfo.classList.remove('show');
-                } else {
-                    throw new Error(result.error || 'فشل الرفع');
-                }
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = '🚀 رفع الملف';
+                    progressBar.classList.remove('active');
+                    progressFill.style.width = '0%';
+                });
+
+                xhr.addEventListener('error', () => {
+                    showMessage('❌ خطأ في الاتصال', 'error');
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = '🚀 رفع الملف';
+                    progressBar.classList.remove('active');
+                });
+
+                xhr.open('POST', '/upload');
+                xhr.send(formData);
+
             } catch (error) {
-                statusMsg.className = 'status error show';
-                statusMsg.style.display = 'block';
-                statusMsg.innerHTML = `❌ <strong>خطأ:</strong> ${error.message}`;
-            } finally {
+                showMessage('❌ خطأ: ' + error.message, 'error');
                 uploadBtn.disabled = false;
-                uploadBtn.innerHTML = '📤 رفع الملف';
-                setTimeout(() => { progressContainer.style.display = 'none'; }, 1000);
+                uploadBtn.textContent = '🚀 رفع الملف';
+                progressBar.classList.remove('active');
             }
         });
 
-        function formatBytes(bytes, decimals = 2) {
-            if (!+bytes) return '0 Bytes';
+        // أزرار الإجراءات
+        document.getElementById('viewBtn').addEventListener('click', () => {
+            if (uploadedFileId) {
+                window.open(`/view/${uploadedFileId}`, '_blank');
+            }
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            if (uploadedFileId) {
+                window.open(`/download/${uploadedFileId}`, '_blank');
+            }
+        });
+
+        // دوال مساعدة
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 بايت';
             const k = 1024;
-            const dm = decimals < 0 ? 0 : decimals;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const sizes = ['بايت', 'كيلوبايت', 'ميجابايت', 'جيجابايت'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = 'message ' + type + ' active';
+        }
+
+        function hideMessage() {
+            message.classList.remove('active');
+        }
+
+        function resetForm() {
+            selectedFile = null;
+            fileInput.value = '';
+            document.getElementById('descInput').value = '';
+            renameCheckbox.checked = false;
+            renameWrapper.classList.remove('active');
+            renameInput.value = '';
         }
     </script>
 </body>
