@@ -756,7 +756,6 @@
 
             const formData = new FormData();
             
-            // إعادة تسمية الملف إذا كان الخيار مفعلاً
             let fileToUpload = selectedFile;
             if (renameCheckbox.checked && renameInput.value.trim() !== '') {
                 const newFileName = renameInput.value.trim();
@@ -786,24 +785,31 @@
                 });
 
                 xhr.addEventListener('load', () => {
-                    if (xhr.status === 200) {
-                        const result = JSON.parse(xhr.responseText);
-                        if (result.success) {
-                            uploadedFileId = result.file.id;
-                            showMessage('✅ تم رفع الملف بنجاح!', 'success');
-                            actionButtons.style.display = 'flex';
-                            resetForm();
-                        } else {
-                            showMessage('❌ فشل الرفع: ' + result.error, 'error');
-                        }
-                    } else {
-                        showMessage('❌ خطأ في الاتصال بالخادم', 'error');
-                    }
-                    
+                    // إعادة تفعيل الزر دائماً عند الانتهاء
                     uploadBtn.disabled = false;
                     uploadBtn.textContent = '🚀 رفع الملف';
                     progressBar.classList.remove('active');
                     progressFill.style.width = '0%';
+
+                    if (xhr.status === 200) {
+                        try {
+                            const result = JSON.parse(xhr.responseText);
+                            if (result.success) {
+                                // ✅ هنا كان الخطأ وتم تصحيحه
+                                uploadedFileId = result.db_id; 
+                                showMessage('✅ تم رفع الملف بنجاح!', 'success');
+                                actionButtons.style.display = 'flex';
+                                resetForm();
+                            } else {
+                                showMessage('❌ فشل الرفع: ' + result.error, 'error');
+                            }
+                        } catch (e) {
+                            console.error(e);
+                            showMessage('❌ حدث خطأ في معالجة الرد', 'error');
+                        }
+                    } else {
+                        showMessage('❌ خطأ في الاتصال بالخادم', 'error');
+                    }
                 });
 
                 xhr.addEventListener('error', () => {
