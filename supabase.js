@@ -33,14 +33,20 @@ async function saveFile(fileData) {
   }
 
   try {
+    // حذف description إذا كان فارغاً لتجنب أخطاء قاعدة البيانات
+    const cleanData = { ...fileData };
+    if (!cleanData.description || cleanData.description.trim() === '') {
+      delete cleanData.description;
+    }
+
     const { data, error } = await supabase
       .from('files')
-      .insert([fileData])
+      .insert([cleanData])
       .select()
       .single();
 
     if (error) {
-      console.error('❌ خطأ في حفظ الملف:', error);
+      console.error('❌ خطك في حفظ الملف:', error);
       return { success: false, error: error.message };
     }
 
