@@ -672,60 +672,51 @@
         </a>
     </div>
 
-   <script>
+    <script>
         let selectedFile = null;
+        let uploadedFileId = null;
 
-        // تعريف العناصر
-        const elements = {
-            uploadArea: document.getElementById('uploadArea'),
-            fileInput: document.getElementById('fileInput'),
-            fileInfo: document.getElementById('fileInfo'),
-            uploadForm: document.getElementById('uploadForm'),
-            uploadBtn: document.getElementById('uploadBtn'),
-            progressBar: document.getElementById('progressBar'),
-            progressFill: document.getElementById('progressFill'),
-            message: document.getElementById('message'),
-            actionButtons: document.getElementById('actionButtons'),
-            renameCheckbox: document.getElementById('renameCheckbox'),
-            renameWrapper: document.getElementById('renameWrapper'),
-            renameInput: document.getElementById('renameInput'),
-            viewBtn: document.getElementById('viewBtn'),
-            downloadBtn: document.getElementById('downloadBtn'),
-            fileName: document.getElementById('fileName'),
-            fileSize: document.getElementById('fileSize'),
-            fileType: document.getElementById('fileType'),
-            descInput: document.getElementById('descInput')
-        };
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const uploadForm = document.getElementById('uploadForm');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const message = document.getElementById('message');
+        const actionButtons = document.getElementById('actionButtons');
+        const renameCheckbox = document.getElementById('renameCheckbox');
+        const renameWrapper = document.getElementById('renameWrapper');
+        const renameInput = document.getElementById('renameInput');
 
         // فتح نافذة اختيار الملف
-        elements.uploadArea.addEventListener('click', () => elements.fileInput.click());
+        uploadArea.addEventListener('click', () => fileInput.click());
 
-        // تأثيرات السحب والإفلات
-        elements.uploadArea.addEventListener('dragover', (e) => {
+        // السحب والإفلات
+        uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
-            elements.uploadArea.classList.add('dragover');
+            uploadArea.classList.add('dragover');
         });
 
-        elements.uploadArea.addEventListener('dragleave', () => {
-            elements.uploadArea.classList.remove('dragover');
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
         });
 
-        elements.uploadArea.addEventListener('drop', (e) => {
+        uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            elements.uploadArea.classList.remove('dragover');
+            uploadArea.classList.remove('dragover');
             const file = e.dataTransfer.files[0];
             if (file) handleFileSelect(file);
         });
 
-        // عند اختيار ملف
-        elements.fileInput.addEventListener('change', (e) => {
+        // اختيار الملف
+        fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) handleFileSelect(file);
         });
 
-        // دالة معالجة الملف
+        // معالجة الملف المختار
         function handleFileSelect(file) {
-            // التحقق من الحجم (50 ميجا)
             if (file.size > 50 * 1024 * 1024) {
                 showMessage('❌ الملف كبير جداً! الحد الأقصى 50 ميجابايت', 'error');
                 return;
@@ -733,32 +724,29 @@
 
             selectedFile = file;
             
-            // عرض المعلومات
-            elements.fileName.textContent = file.name;
-            elements.fileSize.textContent = formatBytes(file.size);
-            elements.fileType.textContent = file.type || 'غير معروف';
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = formatBytes(file.size);
+            document.getElementById('fileType').textContent = file.type || 'غير معروف';
             
-            elements.fileInfo.classList.add('active');
-            elements.renameInput.value = file.name; // وضع الاسم الافتراضي
+            fileInfo.classList.add('active');
+            renameInput.value = file.name;
             
             hideMessage();
-            elements.actionButtons.style.display = 'none'; // إخفاء الأزرار القديمة عند اختيار ملف جديد
+            actionButtons.style.display = 'none';
         }
 
-        // منطق مربع إعادة التسمية (CheckBox)
-        elements.renameCheckbox.addEventListener('change', () => {
-            if (elements.renameCheckbox.checked) {
-                elements.renameWrapper.style.display = 'block'; // إجبار الظهور
-                elements.renameWrapper.classList.add('active');
-                elements.renameInput.focus();
+        // خيار إعادة التسمية
+        renameCheckbox.addEventListener('change', () => {
+            if (renameCheckbox.checked) {
+                renameWrapper.classList.add('active');
+                renameInput.focus();
             } else {
-                elements.renameWrapper.style.display = 'none';
-                elements.renameWrapper.classList.remove('active');
+                renameWrapper.classList.remove('active');
             }
         });
 
-        // عملية الرفع
-        elements.uploadForm.addEventListener('submit', async (e) => {
+        // رفع الملف
+        uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             if (!selectedFile) {
@@ -768,94 +756,85 @@
 
             const formData = new FormData();
             
-            // منطق إعادة التسمية قبل الرفع
+            // إعادة تسمية الملف إذا كان الخيار مفعلاً
             let fileToUpload = selectedFile;
-            if (elements.renameCheckbox.checked && elements.renameInput.value.trim() !== '') {
-                const newFileName = elements.renameInput.value.trim();
-                // إنشاء ملف جديد بالاسم الجديد
+            if (renameCheckbox.checked && renameInput.value.trim() !== '') {
+                const newFileName = renameInput.value.trim();
                 fileToUpload = new File([selectedFile], newFileName, { type: selectedFile.type });
             }
             
             formData.append('file', fileToUpload);
             
-            const description = elements.descInput.value.trim();
+            const description = document.getElementById('descInput').value.trim();
             if (description) {
                 formData.append('description', description);
             }
 
-            // تحديث واجهة المستخدم أثناء الرفع
-            elements.uploadBtn.disabled = true;
-            elements.uploadBtn.innerHTML = '⏳ جاري الرفع...';
-            elements.progressBar.classList.add('active');
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '⏳ جاري الرفع...';
+            progressBar.classList.add('active');
             hideMessage();
-            elements.actionButtons.style.display = 'none';
 
             try {
                 const xhr = new XMLHttpRequest();
 
-                // متابعة التقدم
                 xhr.upload.addEventListener('progress', (e) => {
                     if (e.lengthComputable) {
                         const percent = (e.loaded / e.total) * 100;
-                        elements.progressFill.style.width = percent + '%';
+                        progressFill.style.width = percent + '%';
                     }
                 });
 
-                // عند اكتمال الطلب
                 xhr.addEventListener('load', () => {
-                    elements.uploadBtn.disabled = false;
-                    elements.uploadBtn.innerHTML = '🚀 رفع ملف آخر';
-                    elements.progressBar.classList.remove('active');
-                    elements.progressFill.style.width = '0%';
-
                     if (xhr.status === 200) {
-                        try {
-                            const result = JSON.parse(xhr.responseText);
-                            
-                            if (result.success) {
-                                showMessage('✅ تم رفع الملف بنجاح!', 'success');
-                                elements.actionButtons.style.display = 'flex'; // إظهار الأزرار
-                                
-                                // ★★★ الإصلاح الرئيسي هنا ★★★
-                                // نقوم بربط الأزرار مباشرة بالرابط القادم من السيرفر
-                                const fileId = result.db_id; 
-                                
-                                // تفعيل زر المشاهدة
-                                elements.viewBtn.onclick = function() {
-                                    window.open(`/view/${fileId}`, '_blank');
-                                };
-
-                                // تفعيل زر التحميل
-                                elements.downloadBtn.onclick = function() {
-                                    window.open(`/download/${fileId}`, '_blank');
-                                };
-                                
-                                // تنظيف النموذج
-                                resetForm(false); 
-
-                            } else {
-                                showMessage('❌ فشل الرفع: ' + (result.error || 'خطأ غير معروف'), 'error');
-                            }
-                        } catch (e) {
-                            console.error('JSON Error:', e);
-                            showMessage('❌ حدث خطأ في قراءة رد السيرفر', 'error');
+                        const result = JSON.parse(xhr.responseText);
+                        if (result.success) {
+                            // 🚀 التصحيح هنا: استخدام db_id بدلاً من file.id
+                            uploadedFileId = result.db_id;
+                            showMessage('✅ تم رفع الملف بنجاح!', 'success');
+                            actionButtons.style.display = 'flex';
+                            resetForm();
+                        } else {
+                            showMessage('❌ فشل الرفع: ' + result.error, 'error');
                         }
                     } else {
-                        showMessage('❌ خطأ في السيرفر: ' + xhr.status, 'error');
+                        showMessage('❌ خطأ في الاتصال بالخادم', 'error');
                     }
+                    
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = '🚀 رفع الملف';
+                    progressBar.classList.remove('active');
+                    progressFill.style.width = '0%';
                 });
 
                 xhr.addEventListener('error', () => {
-                    showMessage('❌ تعذر الاتصال بالسيرفر', 'error');
-                    resetUIState();
+                    showMessage('❌ خطأ في الاتصال', 'error');
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = '🚀 رفع الملف';
+                    progressBar.classList.remove('active');
                 });
 
                 xhr.open('POST', '/upload');
                 xhr.send(formData);
 
             } catch (error) {
-                showMessage('❌ حدث خطأ: ' + error.message, 'error');
-                resetUIState();
+                showMessage('❌ خطأ: ' + error.message, 'error');
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '🚀 رفع الملف';
+                progressBar.classList.remove('active');
+            }
+        });
+
+        // أزرار الإجراءات
+        document.getElementById('viewBtn').addEventListener('click', () => {
+            if (uploadedFileId) {
+                window.open(`/view/${uploadedFileId}`, '_blank');
+            }
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            if (uploadedFileId) {
+                window.open(`/download/${uploadedFileId}`, '_blank');
             }
         });
 
@@ -869,29 +848,21 @@
         }
 
         function showMessage(text, type) {
-            elements.message.textContent = text;
-            elements.message.className = 'message ' + type + ' active';
+            message.textContent = text;
+            message.className = 'message ' + type + ' active';
         }
 
         function hideMessage() {
-            elements.message.classList.remove('active');
+            message.classList.remove('active');
         }
 
-        function resetUIState() {
-            elements.uploadBtn.disabled = false;
-            elements.uploadBtn.innerHTML = '🚀 رفع الملف';
-            elements.progressBar.classList.remove('active');
-        }
-
-        function resetForm(clearFile = true) {
-            if (clearFile) {
-                selectedFile = null;
-                elements.fileInput.value = '';
-                elements.fileInfo.classList.remove('active');
-            }
-            // لا نمسح الوصف والاسم فوراً لكي يراها المستخدم، لكن نجهز لملف جديد
-            elements.renameCheckbox.checked = false;
-            elements.renameWrapper.style.display = 'none';
+        function resetForm() {
+            selectedFile = null;
+            fileInput.value = '';
+            document.getElementById('descInput').value = '';
+            renameCheckbox.checked = false;
+            renameWrapper.classList.remove('active');
+            renameInput.value = '';
         }
     </script>
 </body>
