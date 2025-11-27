@@ -8,7 +8,7 @@ const fetch = require('node-fetch');
 const FormData = require('form-data');
 const cors = require('cors');
 const path = require('path');
-const Groq = require('groq-sdk'); // مكتبة Groq الجديدة
+const Groq = require('groq-sdk');
 
 // إعداد Groq
 const groq = process.env.GROQ_API_KEY 
@@ -48,7 +48,7 @@ async function generateWithGroq(prompt, base64Image, mimeType) {
     ];
 
     // دعم الصور (JPG, PNG) بشكل مباشر
-    if (mimeType.startsWith('image/')) {
+    if (mimeType && mimeType.startsWith('image/')) {
       messages[0].content.push({
         type: "image_url",
         image_url: {
@@ -56,13 +56,15 @@ async function generateWithGroq(prompt, base64Image, mimeType) {
         }
       });
     } else {
-      // للملفات الأخرى، نعتمد على النص فقط مع تنبيه
-      messages[0].content[0].text += "\n\n(ملاحظة: هذا مستند نصي، حاول تحليل محتواه قدر الإمكان)";
+      // للملفات النصية والـ PDF، نرسل تحذيراً للموديل
+      // ملاحظة: Groq Vision يركز على الصور، النصوص الطويلة جداً قد تحتاج معالجة خاصة
+      messages[0].content[0].text += "\n\n(ملاحظة: هذا مستند نصي أو PDF، حاول تحليل محتواه بناءً على السياق المرفق)";
     }
 
     const completion = await groq.chat.completions.create({
       messages: messages,
-      model: "llama-3.2-11b-vision-preview", // موديل قوي جداً للرؤية
+      // ⚠️ تم التحديث للموديل الجديد الأقوى والمدعوم حالياً
+      model: "llama-3.2-90b-vision-preview", 
       temperature: 0.5,
       max_tokens: 1500,
     });
@@ -79,6 +81,8 @@ async function generateWithGroq(prompt, base64Image, mimeType) {
 // ═══════════════════════════════════════════════════════
 
 app.post('/api/ai/generate', async (req, res) => {
+  let currentMimeType = ''; // لتخزين نوع الملف واستخدامه في الـ catch
+  
   try {
     if (!groq) return res.status(500).json({ success: false, error: 'لم يتم تعيين GROQ_API_KEY' });
 
@@ -88,6 +92,7 @@ app.post('/api/ai/generate', async (req, res) => {
     const fileResult = await getFileById(fileId);
     if (!fileResult.success) return res.status(404).json({ success: false, error: 'الملف غير موجود' });
     const fileData = fileResult.data;
+    currentMimeType = fileData.mime_type; // حفظ النوع
 
     // 2. تحميل الملف من تيليجرام
     const fileInfoUrl = `https://api.telegram.org/bot${BOT_TOKEN}/getFile?file_id=${fileData.telegram_file_id}`;
@@ -129,11 +134,14 @@ app.post('/api/ai/generate', async (req, res) => {
     res.json({ success: true, result: aiResponse });
 
   } catch (error) {
-    console.error('Groq API Error:', error);
+    console.error('Groq API Error:', error.message);
+    
     let msg = 'حدث خطأ أثناء المعالجة.';
-    if (fileResult?.data?.mime_type === 'application/pdf') {
-       msg = 'Groq Vision يعمل بأفضل كفاءة مع الصور (JPG/PNG). ملفات PDF قد لا تكون مدعومة بالكامل.';
+    // رسالة مخصصة إذا كان الملف PDF لأن Groq Vision قد يواجه صعوبة معه
+    if (currentMimeType === 'application/pdf') {
+       msg = 'Groq Vision يعمل بأفضل كفاءة مع الصور (JPG/PNG). حاول تحويل الـ PDF إلى صور للحصول على أفضل نتيجة.';
     }
+    
     res.status(500).json({ success: false, error: msg });
   }
 });
@@ -147,7 +155,6 @@ app.get('/gallery', (req, res) => res.sendFile(path.join(__dirname, 'public', 'g
 app.get('/study', (req, res) => res.sendFile(path.join(__dirname, 'public', 'study.html')));
 app.get('/health', (req, res) => res.json({ status: 'running', ai_provider: 'Groq', groq_configured: !!groq }));
 
-// Streaming View
 app.get('/view/:id', async (req, res) => {
   try {
     const fileId = parseInt(req.params.id);
@@ -160,7 +167,6 @@ app.get('/view/:id', async (req, res) => {
   } catch(e) { res.status(500).end(); }
 });
 
-// Streaming Download
 app.get('/download/:id', async (req, res) => {
     try {
         const fileId = parseInt(req.params.id);
@@ -173,7 +179,6 @@ app.get('/download/:id', async (req, res) => {
       } catch(e) { res.status(500).end(); }
 });
 
-// Upload
 app.post('/upload', upload.single('file'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({error: 'No file'});
