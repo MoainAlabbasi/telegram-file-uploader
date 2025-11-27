@@ -84,124 +84,84 @@ app.get('/health', (req, res) => {
 // ═══════════════════════════════════════════════════════
 // الجسر الذكي (Smart Bridge) - v3.0 ✨
 // ═══════════════════════════════════════════════════════
-
-// عرض الملف مباشرة في المتصفح
+// عرض الملف مباشرة في المتصفح (نظام Streaming)
 app.get('/view/:id', async (req, res) => {
   try {
     const fileId = parseInt(req.params.id);
     
-    // الحصول على معلومات الملف من قاعدة البيانات
+    // 1. جلب المعلومات من الداتابيس
     const result = await getFileById(fileId);
-    
     if (!result.success) {
-      return res.status(404).send(`
-        <!DOCTYPE html>
-        <html lang="ar" dir="rtl">
-        <head>
-          <meta charset="UTF-8">
-          <title>ملف غير موجود</title>
-          <style>
-            body { font-family: 'Segoe UI', Tahoma; text-align: center; padding: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-            h1 { font-size: 48px; }
-          </style>
-        </head>
-        <body>
-          <h1>❌ الملف غير موجود</h1>
-          <p>لم يتم العثور على الملف المطلوب</p>
-          <a href="/gallery" style="color: white; text-decoration: underline;">العودة للمعرض</a>
-        </body>
-        </html>
-      `);
+      return res.status(404).send('المملف غير موجود');
     }
-    
     const fileData = result.data;
     
-    // الحصول على رابط الملف المباشر من تيليجرام
+    // 2. جلب رابط تيليجرام
     const fileInfoUrl = `https://api.telegram.org/bot${BOT_TOKEN}/getFile?file_id=${fileData.telegram_file_id}`;
     const fileInfoResponse = await fetch(fileInfoUrl);
     const fileInfo = await fileInfoResponse.json();
     
-    if (!fileInfo.ok) {
-      return res.status(500).send('خطأ في الحصول على الملف من تيليجرام');
-    }
+    if (!fileInfo.ok) return res.status(500).send('خطأ تيليجرام');
     
-    // إنشاء الرابط المباشر
-    const filePath = fileInfo.result.file_path;
-    const directUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${filePath}`;
+    const directUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${fileInfo.result.file_path}`;
     
-    // تحميل الملف من تيليجرام وإرساله مع headers صحيحة للعرض المباشر
+    // 3. طلب الملف من تيليجرام (بدون تحميله للذاكرة)
     const fileResponse = await fetch(directUrl);
-    const fileBuffer = await fileResponse.buffer();
     
-    // تحديد Content-Type بناءً على نوع الملف
-    const mimeType = fileData.mime_type || 'application/octet-stream';
-    
-    // إرسال الملف للعرض المباشر في المتصفح (inline بدلاً من attachment)
-    res.setHeader('Content-Type', mimeType);
+    // 4. إعداد الرؤوس (Headers) فوراً
+    res.setHeader('Content-Type', fileData.mime_type || 'application/octet-stream');
     res.setHeader('Content-Disposition', 'inline');
-    res.send(fileBuffer);
+
+    // 5. الأنبوب السحري (Piping) - يمرر البيانات من تيليجرام للمستخدم مباشرة
+    fileResponse.body.pipe(res);
     
+    // معالجة الأخطاء أثناء النقل
+    fileResponse.body.on('error', (err) => {
+      console.error('Error in stream:', err);
+      res.end();
+    });
+
   } catch (error) {
-    console.error('❌ خطأ في عرض الملف:', error.message);
-    res.status(500).send('خطأ في عرض الملف');
+    console.error('❌ خطأ:', error.message);
+    if (!res.headersSent) res.status(500).send('خطأ في الخادم');
   }
 });
 
-// تحميل الملف مباشرة
+// تحميل الملف (نظام Streaming)
 app.get('/download/:id', async (req, res) => {
   try {
     const fileId = parseInt(req.params.id);
     
-    // الحصول على معلومات الملف من قاعدة البيانات
+    // 1. جلب المعلومات
     const result = await getFileById(fileId);
-    
-    if (!result.success) {
-      return res.status(404).json({
-        success: false,
-        error: 'الملف غير موجود'
-      });
-    }
-    
+    if (!result.success) return res.status(404).json({error: 'غير موجود'});
     const fileData = result.data;
     
-    // الحصول على رابط الملف المباشر من تيليجرام
+    // 2. جلب رابط تيليجرام
     const fileInfoUrl = `https://api.telegram.org/bot${BOT_TOKEN}/getFile?file_id=${fileData.telegram_file_id}`;
     const fileInfoResponse = await fetch(fileInfoUrl);
     const fileInfo = await fileInfoResponse.json();
     
-    if (!fileInfo.ok) {
-      return res.status(500).json({
-        success: false,
-        error: 'خطأ في الحصول على الملف من تيليجرام'
-      });
-    }
+    if (!fileInfo.ok) return res.status(500).json({error: 'خطأ تيليجرام'});
     
-    // إنشاء الرابط المباشر
-    const filePath = fileInfo.result.file_path;
-    const directUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${filePath}`;
+    const directUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${fileInfo.result.file_path}`;
     
-    // تحميل الملف من تيليجرام
+    // 3. بدء تدفق الملف
     const fileResponse = await fetch(directUrl);
-    const fileBuffer = await fileResponse.buffer();
     
-    // إرسال الملف للمستخدم مع اسم الملف الأصلي (دعم كامل للعربية)
+    // 4. إعداد رؤوس التحميل
     const encodedFilename = encodeURIComponent(fileData.file_name);
-    // استخدام filename* فقط لتجنب مشاكل encoding
     res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodedFilename}`);
     res.setHeader('Content-Type', fileData.mime_type || 'application/octet-stream');
-    res.send(fileBuffer);
     
-    console.log(`✓ تم تحميل الملف: ${fileData.file_name}`);
-    
+    // 5. الأنبوب السحري (Piping)
+    fileResponse.body.pipe(res);
+
   } catch (error) {
-    console.error('❌ خطأ في تحميل الملف:', error.message);
-    res.status(500).json({
-      success: false,
-      error: `خطأ في تحميل الملف: ${error.message}`
-    });
+    console.error('❌ خطأ:', error.message);
+    if (!res.headersSent) res.status(500).send('خطأ في التحميل');
   }
 });
-
 // ═══════════════════════════════════════════════════════
 // رفع الملف مع دعم الوصف - v3.0 ✨
 // ═══════════════════════════════════════════════════════
