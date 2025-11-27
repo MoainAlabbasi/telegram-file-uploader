@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════
-// Telegram File Manager - Powered by Groq AI 🚀
+// Telegram File Manager - Powered by Gemini AI 🧠
 // ═══════════════════════════════════════════════════════
 
 const express = require('express');
@@ -8,14 +8,14 @@ const fetch = require('node-fetch');
 const FormData = require('form-data');
 const cors = require('cors');
 const path = require('path');
-const Groq = require('groq-sdk');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// إعداد Groq
-const groq = process.env.GROQ_API_KEY 
-  ? new Groq({ apiKey: process.env.GROQ_API_KEY }) 
+// إعداد Gemini
+// تأكد من وضع المفتاح في Railway باسم GEMINI_API_KEY
+const genAI = process.env.GEMINI_API_KEY 
+  ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
   : null;
 
-// استيراد وظائف Supabase
 const {
   saveFile, getAllFiles, searchFiles, deleteFile, getStats, getFileType, getFileById, isConfigured: isSupabaseConfigured
 } = require('./supabase');
@@ -33,68 +33,21 @@ const storage = multer.memoryStorage();
 const upload = multer({ limits: { fileSize: 50 * 1024 * 1024 } });
 
 // ═══════════════════════════════════════════════════════
-// 🧠 نموذج التلخيص (Groq Llama 3 Vision)
-// ═══════════════════════════════════════════════════════
-
-async function generateWithGroq(prompt, base64Image, mimeType) {
-  try {
-    let messages = [
-      {
-        role: "user",
-        content: [
-          { type: "text", text: prompt }
-        ]
-      }
-    ];
-
-    // دعم الصور (JPG, PNG) بشكل مباشر
-    if (mimeType && mimeType.startsWith('image/')) {
-      messages[0].content.push({
-        type: "image_url",
-        image_url: {
-          url: `data:${mimeType};base64,${base64Image}`
-        }
-      });
-    } else {
-      // للملفات النصية والـ PDF، نرسل تحذيراً للموديل
-      // ملاحظة: Groq Vision يركز على الصور، النصوص الطويلة جداً قد تحتاج معالجة خاصة
-      messages[0].content[0].text += "\n\n(ملاحظة: هذا مستند نصي أو PDF، حاول تحليل محتواه بناءً على السياق المرفق)";
-    }
-
-    const completion = await groq.chat.completions.create({
-      messages: messages,
-      // ⚠️ تم التحديث للموديل الجديد الأقوى والمدعوم حالياً
-      model: "llama-3.2-90b-vision-preview", 
-      temperature: 0.5,
-      max_tokens: 1500,
-    });
-
-    return completion.choices[0]?.message?.content || "عذراً، لم أتمكن من إنشاء المحتوى.";
-  } catch (error) {
-    console.error("Groq Function Error:", error);
-    throw error;
-  }
-}
-
-// ═══════════════════════════════════════════════════════
-// API الذكاء الاصطناعي
+// 🧠 نموذج التلخيص (Gemini 1.5 Flash)
 // ═══════════════════════════════════════════════════════
 
 app.post('/api/ai/generate', async (req, res) => {
-  let currentMimeType = ''; // لتخزين نوع الملف واستخدامه في الـ catch
-  
   try {
-    if (!groq) return res.status(500).json({ success: false, error: 'لم يتم تعيين GROQ_API_KEY' });
+    if (!genAI) return res.status(500).json({ success: false, error: 'لم يتم تعيين GEMINI_API_KEY' });
 
     const { fileId, action } = req.body;
     
-    // 1. جلب الملف من قاعدة البيانات
+    // 1. جلب الملف
     const fileResult = await getFileById(fileId);
     if (!fileResult.success) return res.status(404).json({ success: false, error: 'الملف غير موجود' });
     const fileData = fileResult.data;
-    currentMimeType = fileData.mime_type; // حفظ النوع
 
-    // 2. تحميل الملف من تيليجرام
+    // 2. تحميل من تيليجرام
     const fileInfoUrl = `https://api.telegram.org/bot${BOT_TOKEN}/getFile?file_id=${fileData.telegram_file_id}`;
     const fileInfoResponse = await fetch(fileInfoUrl);
     const fileInfo = await fileInfoResponse.json();
@@ -104,56 +57,60 @@ app.post('/api/ai/generate', async (req, res) => {
     const fileResponse = await fetch(directUrl);
     const fileBuffer = await fileResponse.buffer();
 
-    // 3. تجهيز الموجه (Prompt)
+    // 3. اختيار الموديل (الاسم الصحيح من القائمة الخاصة بك)
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    // 4. بناء الموجه (Prompt)
     let prompt = "";
     if (action === 'summarize') {
         prompt = `
-        تصرف كخبير أكاديمي ومساعد دراسي.
+        تصرف كخبير أكاديمي.
         ⚠️ التنسيق المطلوب: Markdown عربي فصحى.
-        
-        المطلوب: قم بإنشاء ملخص للمحتوى المرفق (صورة محاضرة أو مستند) يحتوي على:
-        # عنوان مقترح
+        قم بتلخيص المحتوى (سواء كان صورة، PDF، أو نص) إلى تقرير يحتوي على:
+        # عنوان المحاضرة
         ## الملخص التنفيذي
         ## النقاط الرئيسية (قائمة نقطية)
         ## المصطلحات الهامة (جدول)
         `;
     } else {
         prompt = `
-        تصرف كمعلم خبير.
-        ⚠️ التنسيق المطلوب: Markdown عربي فصحى.
-        
-        المطلوب: أنشئ اختباراً قصيراً (Quiz) من 5 أسئلة (اختيار من متعدد) بناءً على المحتوى المرفق.
-        نسقها بحيث تكون الإجابات الصحيحة في نهاية المستند.
+        أنشئ اختباراً (Quiz) من 5 أسئلة اختيار من متعدد بناءً على المحتوى.
+        ضع الإجابات الصحيحة في الأسفل.
         `;
     }
 
-    // 4. الإرسال لـ Groq
-    console.log(`🤖 Groq يعالج: ${fileData.file_name}`);
-    const aiResponse = await generateWithGroq(prompt, fileBuffer.toString('base64'), fileData.mime_type);
-    
-    res.json({ success: true, result: aiResponse });
+    // 5. الإرسال لـ Gemini
+    console.log(`🤖 Gemini يعالج: ${fileData.file_name}`);
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          data: fileBuffer.toString('base64'),
+          mimeType: fileData.mime_type || 'application/pdf'
+        }
+      }
+    ]);
+
+    const textResponse = result.response.text();
+    res.json({ success: true, result: textResponse });
 
   } catch (error) {
-    console.error('Groq API Error:', error.message);
-    
+    console.error('Gemini Error:', error);
     let msg = 'حدث خطأ أثناء المعالجة.';
-    // رسالة مخصصة إذا كان الملف PDF لأن Groq Vision قد يواجه صعوبة معه
-    if (currentMimeType === 'application/pdf') {
-       msg = 'Groq Vision يعمل بأفضل كفاءة مع الصور (JPG/PNG). حاول تحويل الـ PDF إلى صور للحصول على أفضل نتيجة.';
-    }
-    
+    if(error.message.includes('400')) msg = 'نوع الملف غير مدعوم أو المفتاح غير صالح.';
+    if(error.message.includes('404')) msg = 'الموديل غير موجود (تأكد من المفتاح).';
     res.status(500).json({ success: false, error: msg });
   }
 });
 
 // ═══════════════════════════════════════════════════════
-// بقية المسارات (Routes) - لا تغيير عليها
+// بقية الكود (الأساسي)
 // ═══════════════════════════════════════════════════════
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/gallery', (req, res) => res.sendFile(path.join(__dirname, 'public', 'gallery.html')));
 app.get('/study', (req, res) => res.sendFile(path.join(__dirname, 'public', 'study.html')));
-app.get('/health', (req, res) => res.json({ status: 'running', ai_provider: 'Groq', groq_configured: !!groq }));
+app.get('/health', (req, res) => res.json({ status: 'running', ai_provider: 'Gemini', configured: !!genAI }));
 
 app.get('/view/:id', async (req, res) => {
   try {
@@ -220,4 +177,4 @@ app.get('/api/stats', async (req, res) => { const r = await getStats(); res.json
 
 function formatBytes(bytes) { if(bytes==0) return '0 B'; const k=1024; const i=Math.floor(Math.log(bytes)/Math.log(k)); return Math.round(bytes/Math.pow(k,i)) + ' ' + ['B','KB','MB','GB'][i]; }
 
-app.listen(PORT, () => console.log(`🚀 Server Running on port ${PORT} with Groq AI`));
+app.listen(PORT, () => console.log(`🚀 Server Running on port ${PORT} with Gemini AI`));
