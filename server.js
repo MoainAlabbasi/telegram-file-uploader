@@ -223,7 +223,7 @@ app.post('/api/ai/generate', async (req, res) => {
     const fileBuffer = await fileResponse.buffer();
 
     // 3. المعالجة عبر Gemini
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-001" });
     const prompt = buildLecturePrompt(action, fileData.file_type);
 
     const result = await model.generateContent([
