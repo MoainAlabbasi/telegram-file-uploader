@@ -58,7 +58,8 @@ app.post('/api/ai/generate', async (req, res) => {
     const fileBuffer = await fileResponse.buffer();
 
     // 3. اختيار الموديل (الاسم الصحيح من القائمة الخاصة بك)
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
 
     // 4. بناء الموجه (Prompt)
     let prompt = "";
