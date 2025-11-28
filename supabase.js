@@ -46,7 +46,7 @@ async function saveFile(fileData) {
       .single();
 
     if (error) {
-      console.error('❌ خطك في حفظ الملف:', error);
+      console.error('❌ خطأ في حفظ الملف:', error);
       return { success: false, error: error.message };
     }
 
@@ -220,6 +220,45 @@ function getFileType(mimeType) {
 }
 
 // ═══════════════════════════════════════════════════════
+// دوال الملخصات (الجديدة)
+// ═══════════════════════════════════════════════════════
+
+/**
+ * جلب ملخص الملف (إن وجد)
+ */
+async function getFileSummary(fileId) {
+  if (!supabase) return null;
+  
+  const { data, error } = await supabase
+    .from('file_summaries')
+    .select('telegram_summary_id')
+    .eq('file_id', fileId)
+    .single(); // نأخذ ملخص واحد فقط
+
+  if (error || !data) return null;
+  return data.telegram_summary_id;
+}
+
+/**
+ * حفظ ملخص جديد في الجدول المنفصل
+ */
+async function saveFileSummary(fileId, telegramSummaryId) {
+  if (!supabase) return false;
+
+  const { error } = await supabase
+    .from('file_summaries')
+    .insert([
+      { file_id: fileId, telegram_summary_id: telegramSummaryId }
+    ]);
+
+  if (error) {
+    console.error('❌ خطأ في حفظ الملخص:', error);
+    return false;
+  }
+  return true;
+}
+
+// ═══════════════════════════════════════════════════════
 // التصدير
 // ═══════════════════════════════════════════════════════
 
@@ -232,5 +271,7 @@ module.exports = {
   getFileById,
   getStats,
   getFileType,
+  getFileSummary,   // <--- جديد
+  saveFileSummary,  // <--- جديد
   isConfigured: () => supabase !== null
 };
