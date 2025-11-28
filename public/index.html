@@ -181,49 +181,45 @@
         /* Responsive Design */
         @media (max-width: 768px) { .container { padding: 30px 25px; } h1 { font-size: 1.6rem; } .upload-area { padding: 40px 20px; } .upload-icon { font-size: 52px; } }
         @media (max-width: 480px) { .container { padding: 25px 20px; } h1 { font-size: 1.4rem; } .action-buttons { flex-direction: column; } }
-    
-    
-    /* تنسيق شبكة الأزرار السفلية */
-.nav-grid {
-    display: flex;
-    gap: 15px;
-    margin-top: 25px;
-    position: relative;
-    z-index: 10;
-}
-
-.nav-link {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 16px;
-    border-radius: 14px;
-    text-decoration: none;
-    font-weight: 700;
-    transition: all 0.3s;
-    background: var(--glass-light);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    position: relative;
-    overflow: hidden;
-}
-
-/* زر المعرض (أزرق) */
-.gallery-btn {
-    color: var(--primary);
-    border-color: rgba(0, 212, 255, 0.3);
-}
-.gallery-btn:hover {
-    background: rgba(0, 212, 255, 0.1);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
-    transform: translateY(-3px);
-}
-
-/* زر المساعد الدراسي (بفسجي) */
-.study-btn {
-    color: var(--secondary);
-    border-color: rgba(168, 85, 247, 0.3);
+    	        /* أزرار التنقل الجديدة */
+	        .nav-grid {
+	            display: grid;
+	            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+	            gap: 12px;
+	            margin-top: 25px;
+	            position: relative;
+	            z-index: 10;
+	        }
+	        .nav-link {
+	            display: flex;
+	            flex-direction: column;
+	            align-items: center;
+	            justify-content: center;
+	            padding: 15px 10px;
+	            border-radius: 14px;
+	            text-decoration: none;
+	            font-weight: 600;
+	            transition: all 0.3s;
+	            background: var(--glass-light);
+	            border: 1px solid rgba(255, 255, 255, 0.1);
+	            color: #fff;
+	            font-size: 0.9rem;
+	        }
+	        .nav-link:hover {
+	            transform: translateY(-3px);
+	            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+	        }
+	        .nav-icon {
+	            font-size: 24px;
+	            margin-bottom: 5px;
+	        }
+	        .nav-link.gallery { color: var(--primary); border-color: var(--primary); }
+	        .nav-link.study { color: var(--secondary); border-color: var(--secondary); }
+	        .nav-link.summaries { color: #06b6d4; border-color: #06b6d4; }
+	        .nav-link.quizzes { color: #f97316; border-color: #f97316; }
+	        
+	        /* إزالة تنسيق زر المعرض القديم */
+	        .gallery-link { display: none; });
 }
 .study-btn:hover {
     background: rgba(168, 85, 247, 0.1);
@@ -306,17 +302,26 @@
             </div>
         </form>
 
-<div class="nav-grid">
-    <a href="/gallery" class="nav-link gallery-btn">
-        <span class="nav-icon">📂</span>
-        <span>المعرض</span>
-    </a>
-    <a href="/study" class="nav-link study-btn">
-        <span class="nav-icon">🧠</span>
-        <span>المساعد الذكي</span>
-        <span class="new-badge">جديد</span>
-    </a>
-</div>    </div>
+	        <!-- أزرار التنقل الجديدة -->
+	        <div class="nav-grid">
+	            <a href="/gallery" class="nav-link gallery">
+	                <span class="nav-icon">🖼️</span>
+	                المعرض
+	            </a>
+	            <a href="/study" class="nav-link study">
+	                <span class="nav-icon">🧠</span>
+	                المساعد الدراسي
+	            </a>
+	            <a href="/summaries" class="nav-link summaries">
+	                <span class="nav-icon">📝</span>
+	                الملخصات
+	            </a>
+	            <a href="/quizzes" class="nav-link quizzes">
+	                <span class="nav-icon">❓</span>
+	                الاختبارات
+	            </a>
+	        </div>
+	    </div>
 
     <script>
         let selectedFile = null;
