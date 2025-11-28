@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📂 معرض الملفات - MoTech Cloud</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* ألوان مستوحاة من صورة MoTech */
+            --primary: #00d4ff;
+            --secondary: #a855f7;
+            --accent: #06b6d4;
+            --dark: #0f172a;
+            --darker: #020617;
+            --glass: rgba(15, 23, 42, 0.85);
+            --glass-light: rgba(255, 255, 255, 0.05);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --glow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: var(--darker);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* خلفية MoTech الضبابية */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://files.manuscdn.com/user_upload_by_module/session_file/310419663030263150/PZGumcJnDdDnCtqE.jpg') center/cover no-repeat fixed;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        /* تأثير شبكة تقنية */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: grid-move 20s linear infinite;
+        }
+
+        @keyframes grid-move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* الهيدر */
+        .header {
+            background: var(--glass);
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            animation: slideDown 0.6s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 2.2rem;
+            font-weight: 800;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.05rem;
+            margin-bottom: 25px;
+        }
+
+        /* الإحصائيات */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .stat-card {
+            background: var(--glass-light);
+            padding: 20px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            background: rgba(0, 212, 255, 0.05);
+            box-shadow: var(--glow);
+            transform: translateY(-3px);
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            color: var(--primary);
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        /* أدوات التحكم */
+        .controls {
+            background: var(--glass);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .control-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 2px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            background: var(--glass-light);
+            color: #fff;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .sort-box {
+            min-width: 200px;
+        }
+
+        .sort-select {
+            width: 100%;
+            padding: 14px 20px;
+            border: 2px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            background: var(--glass-light);
+            color: #fff;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .sort-select:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .sort-select option {
+            background: var(--dark);
+            color: #fff;
+        }
+
+        /* الفلاتر */
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            border: 2px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            background: var(--glass-light);
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+
+        /* شبكة الملفات */
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .file-card {
+            background: var(--glass);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            transition: all 0.3s;
+            animation: scaleIn 0.4s ease;
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .file-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6);
+            border-color: var(--primary);
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .file-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.3));
+        }
+
+        .file-name {
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 12px;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+
+        .file-desc {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            max-height: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .file-meta-item {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+        }
+
+        .file-meta-value {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .file-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-view {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-view:hover {
+            background: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-download {
+            background: rgba(168, 85, 247, 0.1);
+            color: var(--secondary);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .btn-download:hover {
+            background: rgba(168, 85, 247, 0.2);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+        }
+
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.2);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+
+        /* رسالة فارغة */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        /* زر العودة */
+        .back-btn {
+            display: inline-block;
+            padding: 14px 30px;
+            background: var(--glass);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 25px;
+            transition: all 0.3s;
+            backdrop-filter: blur(20px);
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            box-shadow: var(--glow);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .files-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .header {
+                padding: 25px 20px;
+                border-radius: 16px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .subtitle {
+                font-size: 0.95rem;
+            }
+
+            .stats {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+
+            .controls {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .control-row {
+                flex-direction: column;
+            }
+
+            .search-box, .sort-box {
+                width: 100%;
+                min-width: unset;
+            }
+
+            .filters {
+                gap: 10px;
+            }
+
+            .filter-btn {
+                padding: 10px 18px;
+                font-size: 0.9rem;
+            }
+
+            .files-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .file-card {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 12px;
+            }
+
+            .stat-label {
+                font-size: 0.8rem;
+            }
+
+            .stat-value {
+                font-size: 1.3rem;
+            }
+
+            .controls {
+                padding: 15px;
+            }
+
+            .search-input, .sort-select {
+                padding: 12px 16px;
+                font-size: 0.95rem;
+            }
+
+            .filters {
+                gap: 8px;
+            }
+
+            .filter-btn {
+                padding: 9px 16px;
+                font-size: 0.85rem;
+            }
+
+            .file-card {
+                padding: 18px;
+            }
+
+            .file-icon {
+                font-size: 42px;
+            }
+
+            .file-name {
+                font-size: 1rem;
+            }
+
+            .file-desc {
+                font-size: 0.85rem;
+            }
+
+            .file-meta {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .file-actions {
+                flex-direction: column;
+            }
+
+            .file-btn {
+                padding: 11px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .header {
+                padding: 18px 12px;
+            }
+
+            h1 {
+                font-size: 1.3rem;
+            }
+
+            .stats {
+                gap: 8px;
+            }
+
+            .stat-card {
+                padding: 10px;
+            }
+
+            .file-card {
+                padding: 15px;
+            }
+        }
+
+        /* تحسينات للأجهزة اللوحية */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .files-grid {
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            }
+
+            .header {
+                padding: 30px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* تحسينات للشاشات الكبيرة */
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 1600px;
+            }
+
+            .files-grid {
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📂 معرض الملفات</h1>
+            <p class="subtitle">جميع ملفاتك في مكان واحد - مدعوم بتقنية MoTech Cloud</p>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">📊 إجمالي الملفات</div>
+                    <div class="stat-value" id="totalFiles">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">💾 الحجم الكلي</div>
+                    <div class="stat-value" id="totalSize">0 MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">📁 أنواع الملفات</div>
+                    <div class="stat-value" id="fileTypes">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-row">
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="search-input" 
+                        placeholder="🔍 ابحث عن ملف..."
+                    >
+                </div>
+                <div class="sort-box">
+                    <select id="sortSelect" class="sort-select">
+                        <option value="date-desc">🔄 فرز حسب: الأحدث أولاً</option>
+                        <option value="date-asc">⬆️ الأقدم أولاً</option>
+                        <option value="name-asc">🔤 الاسم (أ-ي)</option>
+                        <option value="name-desc">🔥 الاسم (ي-أ)</option>
+                        <option value="size-desc">📈 الأكبر حجماً</option>
+                        <option value="size-asc">📉 الأصغر حجماً</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filters">
+                <button class="filter-btn active" data-type="all">📦 الكل</button>
+                <button class="filter-btn" data-type="image">🖼️ صور</button>
+                <button class="filter-btn" data-type="video">🎥 فيديو</button>
+                <button class="filter-btn" data-type="audio">🎵 صوت</button>
+                <button class="filter-btn" data-type="document">📄 مستندات</button>
+            </div>
+        </div>
+
+        <div class="files-grid" id="filesGrid">
+            <!-- الملفات ستُضاف هنا -->
+        </div>
+
+        <div style="text-align: center;">
+            <a href="/" class="back-btn">🏠 العودة للرئيسية</a>
+        </div>
+    </div>
+
+    <script>
+        let allFiles = [];
+        let currentFilter = 'all';
+        let currentSort = 'date-desc';
+
+        // تحميل الملفات عند فتح الصفحة
+        window.addEventListener('load', async () => {
+            await loadFiles();
+            await loadStats();
+        });
+
+        // الفرز
+        const sortSelect = document.getElementById('sortSelect');
+        sortSelect.addEventListener('change', () => {
+            currentSort = sortSelect.value;
+            filterFiles(currentFilter);
+        });
+
+        // تحميل الملفات من API
+        async function loadFiles() {
+            try {
+                const response = await fetch('/api/files?limit=1000');
+                const result = await response.json();
+
+                if (result.success) {
+                    allFiles = result.files;
+                    filterFiles(currentFilter);
+                    updateStats(result.total);
+                } else {
+                    showError('فشل تحميل الملفات: ' + result.error);
+                }
+            } catch (error) {
+                showError('خطأ في الاتصال بالخادم: ' + error.message);
+            }
+        }
+
+        // تحميل الإحصائيات
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const result = await response.json();
+
+                if (result.success && result.stats) {
+                    document.getElementById('totalFiles').textContent = result.stats.total_files || 0;
+                    document.getElementById('totalSize').textContent = formatBytes(result.stats.total_size || 0);
+                    document.getElementById('fileTypes').textContent = result.stats.file_types_count || 0;
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل الإحصائيات:', error);
+            }
+        }
+
+        // عرض الملفات
+        function displayFiles(files) {
+            const grid = document.getElementById('filesGrid');
+            
+            if (files.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <div class="empty-text">لا توجد ملفات</div>
+                        <p style="color: rgba(255,255,255,0.4);">ابدأ برفع ملفاتك الآن!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = files.map(file => `
+                <div class="file-card">
+                    <div class="file-icon">${getFileIcon(file.file_type)}</div>
+                    <div class="file-name">${escapeHtml(file.file_name)}</div>
+                    ${file.description ? `<div class="file-desc">${escapeHtml(file.description)}</div>` : ''}
+                    <div class="file-meta">
+                        <div class="file-meta-item">
+                            📊 <span class="file-meta-value">${formatBytes(file.file_size)}</span>
+                        </div>
+                        <div class="file-meta-item">
+                            📅 <span class="file-meta-value">${formatDate(file.created_at)}</span>
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-btn btn-view" onclick="viewFile(${file.id})">👁️ مشاهدة</button>
+                        <button class="file-btn btn-download" onclick="downloadFile(${file.id})">⬇️ تحميل</button>
+                        <button class="file-btn btn-delete" onclick="deleteFile(${file.id})">🗑️ حذف</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // مشاهدة ملف
+        function viewFile(id) {
+            window.open(`/view/${id}`, '_blank');
+        }
+
+        // تحميل ملف
+        function downloadFile(id) {
+            window.open(`/download/${id}`, '_blank');
+        }
+
+        // حذف ملف
+        async function deleteFile(id) {
+            if (!confirm('⚠️ هل أنت متأكد من حذف هذا الملف؟\n\nسيتم حذفه من قاعدة البيانات وتيليجرام نهائياً.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/files/${id}`, { method: 'DELETE' });
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✓ تم حذف الملف بنجاح');
+                    await loadFiles();
+                    await loadStats();
+                } else {
+                    alert('✗ فشل حذف الملف: ' + result.error);
+                }
+            } catch (error) {
+                alert('✗ خطأ: ' + error.message);
+            }
+        }
+
+        // البحث
+        const searchInput = document.getElementById('searchInput');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const query = e.target.value.trim();
+                if (query) {
+                    searchFiles(query);
+                } else {
+                    filterFiles(currentFilter);
+                }
+            }, 300);
+        });
+
+        // البحث عن ملفات
+        async function searchFiles(query) {
+            try {
+                const response = await fetch(`/api/files/search?q=${encodeURIComponent(query)}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const sorted = sortFiles(result.files, currentSort);
+                    displayFiles(sorted);
+                } else {
+                    showError('فشل البحث: ' + result.error);
+                }
+            } catch (error) {
+                showError('خطأ في البحث: ' + error.message);
+            }
+        }
+
+        // الفلترة
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.type;
+                searchInput.value = '';
+                filterFiles(currentFilter);
+            });
+        });
+
+        function filterFiles(type) {
+            let filtered = type === 'all' ? [...allFiles] : allFiles.filter(f => f.file_type === type);
+            
+            // تطبيق الفرز
+            filtered = sortFiles(filtered, currentSort);
+            
+            displayFiles(filtered);
+        }
+
+        // دالة الفرز
+        function sortFiles(files, sortType) {
+            const sorted = [...files];
+            
+            switch(sortType) {
+                case 'date-desc':
+                    return sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                case 'date-asc':
+                    return sorted.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                case 'name-asc':
+                    return sorted.sort((a, b) => a.file_name.localeCompare(b.file_name, 'ar'));
+                case 'name-desc':
+                    return sorted.sort((a, b) => b.file_name.localeCompare(a.file_name, 'ar'));
+                case 'size-desc':
+                    return sorted.sort((a, b) => b.file_size - a.file_size);
+                case 'size-asc':
+                    return sorted.sort((a, b) => a.file_size - b.file_size);
+                default:
+                    return sorted;
+            }
+        }
+
+        // دوال مساعدة
+        function getFileIcon(type) {
+            const icons = {
+                'image': '🖼️',
+                'video': '🎥',
+                'audio': '🎵',
+                'document': '📄'
+            };
+            return icons[type] || '📁';
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 بايت';
+            const k = 1024;
+            const sizes = ['بايت', 'كيلوبايت', 'ميجابايت', 'جيجابايت'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            if (days === 0) return 'اليوم';
+            if (days === 1) return 'أمس';
+            if (days < 7) return `منذ ${days} أيام`;
+            if (days < 30) return `منذ ${Math.floor(days / 7)} أسابيع`;
+            if (days < 365) return `منذ ${Math.floor(days / 30)} شهور`;
+            return `منذ ${Math.floor(days / 365)} سنوات`;
+        }
+
+        function updateStats(total) {
+            document.getElementById('totalFiles').textContent = total || allFiles.length;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showError(message) {
+            alert(message);
+        }
+    </script>
+</body>
+</html>
