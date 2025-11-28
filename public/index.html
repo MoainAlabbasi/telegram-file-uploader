@@ -218,6 +218,9 @@
 	        .nav-link.summaries { color: #06b6d4; border-color: #06b6d4; }
 	        .nav-link.quizzes { color: #f97316; border-color: #f97316; }
 	        
+	        /* إزالة الهامش العلوي من قائمة التنقل الأصلية */
+	        .nav-grid { margin-top: 0; }
+	        
 	        /* إزالة تنسيق زر المعرض القديم */
 	        .gallery-link { display: none; });
 }
@@ -261,7 +264,7 @@
             <p class="subtitle">رافع الملفات الذكي - مدعوم بتقنية تيليجرام</p>
         </div>
 
-        <form id="uploadForm" enctype="multipart/form-data">
+	        <form id="uploadForm" enctype="multipart/form-data" style="margin-top: 20px;">
             <div class="upload-area" id="uploadArea">
                 <div class="upload-icon">📤</div>
                 <div class="upload-text">اضغط أو اسحب الملف هنا</div>
@@ -302,25 +305,26 @@
             </div>
         </form>
 
-	        <!-- أزرار التنقل الجديدة -->
-	        <div class="nav-grid">
-	            <a href="/gallery" class="nav-link gallery">
-	                <span class="nav-icon">🖼️</span>
-	                المعرض
-	            </a>
-	            <a href="/study" class="nav-link study">
-	                <span class="nav-icon">🧠</span>
-	                المساعد الدراسي
-	            </a>
-	            <a href="/summaries" class="nav-link summaries">
-	                <span class="nav-icon">📝</span>
-	                الملخصات
-	            </a>
-	            <a href="/quizzes" class="nav-link quizzes">
-	                <span class="nav-icon">❓</span>
-	                الاختبارات
-	            </a>
-	        </div>
+	    </div>
+	    
+	    <!-- قائمة التنقل الجديدة البارزة -->
+	    <div class="nav-grid" style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+	        <a href="/gallery" class="nav-link gallery">
+	            <span class="nav-icon">🖼️</span>
+	            المعرض
+	        </a>
+	        <a href="/study" class="nav-link study">
+	            <span class="nav-icon">🧠</span>
+	            المساعد الدراسي
+	        </a>
+	        <a href="/summaries" class="nav-link summaries">
+	            <span class="nav-icon">📝</span>
+	            الملخصات
+	        </a>
+	        <a href="/quizzes" class="nav-link quizzes">
+	            <span class="nav-icon">❓</span>
+	            الاختبارات
+	        </a>
 	    </div>
 
     <script>
