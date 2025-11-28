@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قائمة الاختبارات - MoTech Cloud</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* نفس ستايل المشروع الأصلي للحفاظ على الهوية */
+        :root {
+            --primary: #00d4ff; --secondary: #a855f7; --dark: #0f172a; --glass: rgba(15, 23, 42, 0.85);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Tajawal', sans-serif; background: #020617; color: #fff; min-height: 100vh; padding: 20px;
+        }
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px; z-index: -1;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        .header {
+            text-align: center; margin-bottom: 40px; padding: 30px;
+            background: var(--glass); border-radius: 20px; border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        h1 { color: var(--secondary); font-size: 2.2rem; margin-bottom: 10px; }
+        
+        .quiz-list {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;
+        }
+        
+        .quiz-card {
+            background: var(--glass); border: 1px solid rgba(0, 212, 255, 0.1); border-radius: 16px;
+            padding: 20px; transition: transform 0.3s; position: relative;
+        }
+        .quiz-card:hover { transform: translateY(-5px); border-color: var(--secondary); }
+        
+        .quiz-name { font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; color: var(--primary); }
+        .quiz-details { font-size: 0.9rem; color: #94a3b8; margin-bottom: 15px; }
+        
+        .btn-view {
+            padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;
+            font-family: 'Tajawal'; font-weight: 600; transition: 0.3s;
+            background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.3);
+            display: inline-block; text-decoration: none;
+        }
+        .btn-view:hover { background: rgba(168, 85, 247, 0.3); }
+
+        /* نافذة العرض (Modal) */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9); z-index: 1000; align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; animation: fadeIn 0.3s; }
+        
+        .modal-content {
+            background: #0f172a; width: 90%; max-width: 900px; max-height: 90vh;
+            border-radius: 20px; border: 1px solid var(--secondary); padding: 30px;
+            overflow-y: auto; position: relative; box-shadow: 0 0 50px rgba(168, 85, 247, 0.2);
+        }
+        
+        .close-modal {
+            position: absolute; left: 20px; top: 20px; background: none; border: none;
+            color: #fff; font-size: 24px; cursor: pointer;
+        }
+        
+        .result-area {
+            margin-top: 20px; line-height: 1.8; color: #e2e8f0; font-size: 1.1rem;
+        }
+        /* تنسيق Markdown */
+        .result-area h1, .result-area h2 { color: var(--primary); margin-top: 20px; }
+        .result-area ul { margin-right: 20px; margin-bottom: 15px; }
+        .result-area strong { color: var(--secondary); }
+
+        /* شريط الأدوات (Toolbar) */
+        .toolbar {
+            display: flex; gap: 10px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .toolbar button {
+            padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer;
+            font-family: 'Tajawal'; font-weight: 500; background: #334155; color: #fff;
+            transition: background 0.2s;
+        }
+        .toolbar button:hover { background: #475569; }
+
+        .loader { text-align: center; padding: 40px; }
+        .spinner {
+            width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.1);
+            border-top-color: var(--secondary); border-radius: 50%;
+            animation: spin 1s linear infinite; margin: 0 auto 15px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>📚 الاختبارات التي تم إنشاؤها</h1>
+        <p style="color: #94a3b8;">قائمة بجميع الاختبارات التي تم توليدها وحفظها في تيليجرام</p>
+        <a href="/study" style="color: var(--primary); margin-top: 15px; display: inline-block;">🔙 العودة للمساعد الدراسي</a>
+    </div>
+
+    <div class="quiz-list" id="quizList">
+        <div class="loader active" id="initialLoader">
+            <div class="spinner"></div>
+            <p>جاري تحميل قائمة الاختبارات...</p>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة عرض الاختبار -->
+<div class="modal" id="quizModal">
+    <div class="modal-content">
+        <button class="close-modal" onclick="closeModal()">✕</button>
+        <h2 id="modalTitle" style="color: var(--primary); margin-bottom: 20px;"></h2>
+        
+        <!-- شريط الأدوات (سيتم ملؤه في المرحلة القادمة) -->
+        <div class="toolbar" id="quizToolbar">
+            <button onclick="downloadContent('docx')">📥 DOCX</button>
+            <button onclick="downloadContent('xlsx')">📥 Excel</button>
+            <button onclick="downloadContent('pdf')">📥 PDF</button>
+            <button onclick="downloadContent('pptx')">📥 PowerPoint</button>
+            <button onclick="downloadContent('md')">📥 MD</button>
+            <button onclick="downloadContent('txt')">📥 TXT</button>
+        </div>
+
+        <div class="loader" id="quizContentLoader">
+            <div class="spinner"></div>
+            <p>جاري تحميل محتوى الاختبار (بث مباشر)...</p>
+        </div>
+        
+        <div class="result-area" id="quizContent"></div>
+    </div>
+</div>
+
+<script>
+    let currentQuizId = null;
+
+    window.onload = async () => {
+        await loadQuizzes();
+    };
+
+    async function loadQuizzes() {
+        const list = document.getElementById('quizList');
+        const loader = document.getElementById('initialLoader');
+        list.innerHTML = ''; // مسح المحتوى القديم
+        loader.style.display = 'block';
+
+        try {
+            const res = await fetch('/api/quizzes');
+            const data = await res.json();
+            
+            loader.style.display = 'none';
+
+            if(data.success && data.quizzes.length > 0) {
+                list.innerHTML = data.quizzes.map(quiz => `
+                    <div class="quiz-card">
+                        <div class="quiz-name">${quiz.quiz_name}</div>
+                        <div class="quiz-details">
+                            <p>المصدر: ${quiz.source_file_name || 'غير محدد'}</p>
+                            <p>التاريخ: ${new Date(quiz.created_at).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                        </div>
+                        <button class="btn-view" onclick="viewQuiz(${quiz.id}, '${quiz.quiz_name}')">
+                            عرض الاختبار
+                        </button>
+                    </div>
+                `).join('');
+            } else {
+                list.innerHTML = '<p style="text-align:center; grid-column:1/-1; color:#94a3b8;">لم يتم إنشاء أي اختبارات بعد.</p>';
+            }
+        } catch (e) {
+            loader.style.display = 'none';
+            list.innerHTML = '<p style="text-align:center; grid-column:1/-1; color:red;">خطأ في تحميل قائمة الاختبارات.</p>';
+            console.error(e);
+        }
+    }
+
+    async function viewQuiz(id, name) {
+        currentQuizId = id;
+        const modal = document.getElementById('quizModal');
+        const title = document.getElementById('modalTitle');
+        const content = document.getElementById('quizContent');
+        const loader = document.getElementById('quizContentLoader');
+
+        title.textContent = `عرض الاختبار: ${name}`;
+        content.innerHTML = '';
+        loader.style.display = 'block';
+        modal.classList.add('active');
+
+        try {
+            // استخدام Fetch API مع Response.text() للحصول على المحتوى المبثوث
+            const res = await fetch(`/quiz/view/${id}`);
+            if (!res.ok) throw new Error('فشل في جلب محتوى الاختبار');
+            
+            const markdownText = await res.text();
+            
+            // تحويل Markdown إلى HTML وعرضه
+            content.innerHTML = marked.parse(markdownText);
+            
+        } catch (err) {
+            content.innerHTML = `<p style="color:red; text-align:center;">خطأ في عرض محتوى الاختبار: ${err.message}</p>`;
+            console.error(err);
+        } finally {
+            loader.style.display = 'none';
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('quizModal').classList.remove('active');
+        currentQuizId = null;
+    }
+
+    function downloadContent(format) {
+        if (!currentQuizId) return;
+        const url = \`/api/convert/quiz/\${currentQuizId}/\${format}\`;
+        window.open(url, '_blank');
+    }
+</script>
+
+</body>
+</html>

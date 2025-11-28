@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إنشاء اختبار مخصص - MoTech Cloud</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* نفس ستايل المشروع الأصلي للحفاظ على الهوية */
+        :root {
+            --primary: #00d4ff; --secondary: #a855f7; --dark: #0f172a; --glass: rgba(15, 23, 42, 0.85);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Tajawal', sans-serif; background: #020617; color: #fff; min-height: 100vh; padding: 20px;
+        }
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px; z-index: -1;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        .header {
+            text-align: center; margin-bottom: 40px; padding: 30px;
+            background: var(--glass); border-radius: 20px; border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        h1 { color: var(--secondary); font-size: 2.2rem; margin-bottom: 10px; }
+        
+        .form-section {
+            background: var(--glass); border-radius: 16px; padding: 30px; margin-bottom: 20px;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .question-item {
+            display: flex; gap: 15px; margin-bottom: 15px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px;
+            align-items: center;
+        }
+
+        .question-item > div { flex: 1; }
+
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--primary); }
+        
+        input[type="number"], select {
+            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155;
+            background: #1e293b; color: #fff; font-family: 'Tajawal';
+        }
+
+        .btn {
+            padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer;
+            font-family: 'Tajawal'; font-weight: 700; transition: 0.3s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        .btn-primary { background: var(--secondary); color: #fff; }
+        .btn-primary:hover { background: #9333ea; }
+
+        .btn-add { background: var(--primary); color: var(--dark); }
+        .btn-add:hover { background: #00b8e6; }
+
+        .btn-remove { background: #ef4444; color: #fff; padding: 10px; }
+        .btn-remove:hover { background: #dc2626; }
+
+        .actions { display: flex; justify-content: space-between; margin-top: 30px; }
+
+        .hidden { display: none !important; }
+        .loader { text-align: center; padding: 20px; }
+        .spinner {
+            width: 30px; height: 30px; border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: var(--secondary); border-radius: 50%;
+            animation: spin 1s linear infinite; margin: 0 auto 10px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>📝 إنشاء اختبار مخصص</h1>
+        <p style="color: #94a3b8;">حدد هيكل الاختبار وسيقوم الذكاء الاصطناعي بتوليده من محتوى ملفك</p>
+        <a href="/study" style="color: var(--primary); margin-top: 15px; display: inline-block;">🔙 العودة للمساعد الدراسي</a>
+    </div>
+
+    <div class="form-section">
+        <div style="margin-bottom: 20px;">
+            <label for="fileId">الملف المصدر:</label>
+            <select id="fileId" style="width: 100%;" onchange="updateFileName()"></select>
+            <p id="fileNameDisplay" style="margin-top: 10px; color: #94a3b8;"></p>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="initialCount">عدد الأسئلة الأساسية:</label>
+            <input type="number" id="initialCount" value="3" min="1" onchange="generateQuestionFields()">
+        </div>
+
+        <div id="questionsContainer">
+            <!-- سيتم إضافة حقول الأسئلة هنا ديناميكياً -->
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-add" onclick="addQuestionField()">
+                + إضافة سؤال يدوي
+            </button>
+            <button class="btn btn-primary" onclick="createQuiz()">
+                🚀 توليد الاختبار
+            </button>
+        </div>
+        
+        <div class="loader hidden" id="quizLoader">
+            <div class="spinner"></div>
+            <p id="loaderText">جاري توليد الاختبار... قد يستغرق الأمر دقيقة.</p>
+        </div>
+
+        <p id="messageArea" style="margin-top: 20px; text-align: center; font-weight: 700;"></p>
+    </div>
+</div>
+
+<script>
+    const questionTypes = [
+        "Matching (مطابقة)", "Ranking (ترتيب)", "Complete (إكمال الفراغ)", 
+        "Define (تعريف)", "True/False (صح/خطأ)", "Multiple Choice (اختيار من متعدد)",
+        "Short Answer (إجابة قصيرة)", "Essay (مقالة)"
+    ];
+    let questionCounter = 0;
+
+    window.onload = async () => {
+        await loadFiles();
+        generateQuestionFields(document.getElementById('initialCount').value);
+    };
+
+    async function loadFiles() {
+        const fileSelect = document.getElementById('fileId');
+        try {
+            const res = await fetch('/api/files?limit=50');
+            const data = await res.json();
+            if(data.success) {
+                const supportedFiles = data.files.filter(f => ['document', 'image'].includes(f.file_type));
+                fileSelect.innerHTML = supportedFiles.map(file => 
+                    `<option value="${file.id}" data-name="${file.file_name}">${file.file_name}</option>`
+                ).join('');
+                updateFileName();
+            }
+        } catch (e) {
+            console.error(e);
+            document.getElementById('messageArea').textContent = 'خطأ في تحميل قائمة الملفات.';
+        }
+    }
+
+    function updateFileName() {
+        const fileSelect = document.getElementById('fileId');
+        const selectedOption = fileSelect.options[fileSelect.selectedIndex];
+        const fileName = selectedOption ? selectedOption.getAttribute('data-name') : 'لم يتم اختيار ملف';
+        document.getElementById('fileNameDisplay').textContent = `الملف المختار: ${fileName}`;
+    }
+
+    function generateQuestionFields(count = 3) {
+        const container = document.getElementById('questionsContainer');
+        container.innerHTML = '';
+        questionCounter = 0;
+        for (let i = 0; i < count; i++) {
+            addQuestionField();
+        }
+    }
+
+    function addQuestionField() {
+        questionCounter++;
+        const container = document.getElementById('questionsContainer');
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        div.setAttribute('data-id', questionCounter);
+        
+        div.innerHTML = `
+            <div>
+                <label>نوع السؤال #${questionCounter}:</label>
+                <select class="question-type">
+                    ${questionTypes.map(type => `<option value="${type}">${type}</option>`).join('')}
+                </select>
+            </div>
+            <div>
+                <label>الدرجة:</label>
+                <input type="number" class="question-score" value="5" min="1">
+            </div>
+            <button class="btn btn-remove" onclick="removeQuestionField(this)">✕</button>
+        `;
+        container.appendChild(div);
+    }
+
+    function removeQuestionField(button) {
+        const item = button.closest('.question-item');
+        item.remove();
+        // إعادة ترقيم الأسئلة
+        const items = document.querySelectorAll('.question-item');
+        questionCounter = 0;
+        items.forEach((item, index) => {
+            questionCounter++;
+            item.setAttribute('data-id', questionCounter);
+            item.querySelector('label').textContent = `نوع السؤال #${questionCounter}:`;
+        });
+    }
+
+    async function createQuiz() {
+        const fileId = document.getElementById('fileId').value;
+        const container = document.getElementById('questionsContainer');
+        const loader = document.getElementById('quizLoader');
+        const messageArea = document.getElementById('messageArea');
+        
+        if (!fileId) {
+            messageArea.textContent = 'الرجاء اختيار ملف مصدر.';
+            messageArea.style.color = 'red';
+            return;
+        }
+
+        const questionItems = container.querySelectorAll('.question-item');
+        if (questionItems.length === 0) {
+            messageArea.textContent = 'الرجاء إضافة سؤال واحد على الأقل.';
+            messageArea.style.color = 'red';
+            return;
+        }
+
+        const quizStructure = [];
+        questionItems.forEach(item => {
+            const type = item.querySelector('.question-type').value;
+            const score = parseInt(item.querySelector('.question-score').value);
+            quizStructure.push({ type, score });
+        });
+
+        loader.classList.remove('hidden');
+        messageArea.textContent = '';
+        
+        try {
+            const res = await fetch('/api/ai/generate', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    fileId: parseInt(fileId), 
+                    action: 'quiz', 
+                    quizStructure: quizStructure 
+                })
+            });
+            
+            const data = await res.json();
+            
+            loader.classList.add('hidden');
+            if(data.success) {
+                messageArea.textContent = '✅ تم توليد الاختبار وحفظه بنجاح!';
+                messageArea.style.color = 'var(--primary)';
+                // يمكن توجيه المستخدم لصفحة عرض الاختبارات هنا
+            } else {
+                messageArea.textContent = `❌ حدث خطأ: ${data.error}`;
+                messageArea.style.color = 'red';
+            }
+        } catch (err) {
+            loader.classList.add('hidden');
+            messageArea.textContent = '❌ خطأ في الاتصال بالسيرفر أثناء توليد الاختبار.';
+            messageArea.style.color = 'red';
+        }
+    }
+</script>
+
+</body>
+</html>

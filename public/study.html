@@ -101,11 +101,16 @@
 <body>
 
 <div class="container">
-    <div class="header">
-        <h1>🧠 المساعد الدراسي الذكي</h1>
-        <p style="color: #94a3b8;">حول ملفاتك إلى ملخصات واختبارات تفاعلية باستخدام الذكاء الاصطناعي</p>
-        <a href="/" style="color: var(--primary); margin-top: 15px; display: inline-block;">🏠 العودة للرئيسية</a>
-    </div>
+	    <div class="header">
+	        <h1>🧠 المساعد الدراسي الذكي</h1>
+	        <p style="color: #94a3b8;">حول ملفاتك إلى ملخصات واختبارات تفاعلية باستخدام الذكاء الاصطناعي</p>
+	        <div style="margin-top: 20px; display: flex; justify-content: center; gap: 15px;">
+	            <a href="/" class="ai-btn btn-summary">🏠 الرئيسية</a>
+	            <a href="/summaries" class="ai-btn btn-summary">📝 عرض الملخصات</a>
+	            <a href="/quizzes" class="ai-btn btn-quiz">❓ عرض الاختبارات</a>
+	            <a href="/quiz/create" class="ai-btn btn-quiz">➕ إنشاء اختبار مخصص</a>
+	        </div>
+	    </div>
 
     <div class="files-grid" id="filesGrid">
         </div>

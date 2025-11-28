@@ -259,6 +259,92 @@ async function saveFileSummary(fileId, telegramSummaryId) {
 }
 
 // ═══════════════════════════════════════════════════════
+// دوال الاختبارات (الجديدة)
+// ═══════════════════════════════════════════════════════
+
+/**
+ * حفظ بيانات اختبار جديد
+ */
+async function saveQuiz(quizData) {
+  if (!supabase) {
+    console.warn('⚠️ Supabase غير متصل - لن يتم حفظ بيانات الاختبار');
+    return { success: false, error: 'Supabase not configured' };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('quizzes')
+      .insert([quizData])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('❌ خطأ في حفظ الاختبار:', error);
+      return { success: false, error: error.message };
+    }
+
+    console.log('✓ تم حفظ الاختبار في قاعدة البيانات:', data.id);
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ خطأ غير متوقع:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * جلب جميع الاختبارات
+ */
+async function getAllQuizzes() {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('quizzes')
+      .select('id, quiz_name, source_file_name, created_at, file_id')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('❌ خطأ في جلب الاختبارات:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ خطأ غير متوقع:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * جلب اختبار بواسطة ID
+ */
+async function getQuizById(quizId) {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('quizzes')
+      .select('*')
+      .eq('id', quizId)
+      .single();
+
+    if (error) {
+      console.error('❌ خطأ في جلب الاختبار:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ خطأ غير متوقع:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ═══════════════════════════════════════════════════════
 // التصدير
 // ═══════════════════════════════════════════════════════
 
@@ -271,7 +357,10 @@ module.exports = {
   getFileById,
   getStats,
   getFileType,
-  getFileSummary,   // <--- جديد
-  saveFileSummary,  // <--- جديد
+  getFileSummary,
+  saveFileSummary,
+  saveQuiz,         // <--- جديد
+  getAllQuizzes,    // <--- جديد
+  getQuizById,      // <--- جديد
   isConfigured: () => supabase !== null
 };

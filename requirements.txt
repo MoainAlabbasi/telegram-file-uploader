@@ -1,0 +1,5 @@
+# تبعيات Python المطلوبة لوحدة التحويل (converter.py)
+# يجب تثبيت pandoc على النظام لتشغيل التحويلات بشكل كامل
+python-docx
+openpyxl
+fpdf2
