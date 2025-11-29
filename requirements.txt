@@ -1,5 +1,17 @@
-# تبعيات Python المطلوبة لوحدة التحويل (converter.py)
+# تبعيات Python المطلوبة لنظام MoTech Cloud v4.0
 # يجب تثبيت pandoc على النظام لتشغيل التحويلات بشكل كامل
-python-docx
-openpyxl
-fpdf2
+
+# معالجة المستندات
+python-docx>=0.8.11
+openpyxl>=3.1.0
+fpdf2>=2.7.0
+
+# معالجة Markdown
+markdown>=3.4.0
+
+# معالجة PDF المتقدمة (اختياري)
+# weasyprint>=59.0
+# reportlab>=4.0.0
+
+# أدوات إضافية
+# Pillow>=10.0.0  # معالجة الصور

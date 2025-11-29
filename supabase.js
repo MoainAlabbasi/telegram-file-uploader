@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════
-// Supabase Client Configuration
+// Supabase Client Configuration - Enhanced v4.0
 // ═══════════════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
@@ -20,7 +20,7 @@ const supabase = SUPABASE_URL && SUPABASE_ANON_KEY
   : null;
 
 // ═══════════════════════════════════════════════════════
-// دوال مساعدة للتعامل مع قاعدة البيانات
+// دوال إدارة الملفات (Files)
 // ═══════════════════════════════════════════════════════
 
 /**
@@ -220,7 +220,7 @@ function getFileType(mimeType) {
 }
 
 // ═══════════════════════════════════════════════════════
-// دوال الملخصات (الجديدة)
+// دوال إدارة الملخصات (Summaries)
 // ═══════════════════════════════════════════════════════
 
 /**
@@ -233,7 +233,7 @@ async function getFileSummary(fileId) {
     .from('file_summaries')
     .select('telegram_summary_id')
     .eq('file_id', fileId)
-    .single(); // نأخذ ملخص واحد فقط
+    .single();
 
   if (error || !data) return null;
   return data.telegram_summary_id;
@@ -242,13 +242,19 @@ async function getFileSummary(fileId) {
 /**
  * حفظ ملخص جديد في الجدول المنفصل
  */
-async function saveFileSummary(fileId, telegramSummaryId) {
+async function saveFileSummary(fileId, telegramSummaryId, summaryName = null, wordCount = 0, metadata = {}) {
   if (!supabase) return false;
 
   const { error } = await supabase
     .from('file_summaries')
     .insert([
-      { file_id: fileId, telegram_summary_id: telegramSummaryId }
+      { 
+        file_id: fileId, 
+        telegram_summary_id: telegramSummaryId,
+        summary_name: summaryName,
+        word_count: wordCount,
+        metadata: metadata
+      }
     ]);
 
   if (error) {
@@ -258,12 +264,380 @@ async function saveFileSummary(fileId, telegramSummaryId) {
   return true;
 }
 
+/**
+ * الحصول على جميع الملخصات
+ */
+async function getAllSummaries(limit = 50, offset = 0) {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+
+  try {
+    const { data, error, count } = await supabase
+      .from('file_summaries')
+      .select(`
+        *,
+        files:file_id (
+          id,
+          file_name,
+          file_type,
+          mime_type
+        )
+      `, { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (error) {
+      console.error('❌ خطأ في جلب الملخصات:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data, count };
+  } catch (error) {
+    console.error('❌ خطأ غير متوقع:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * البحث في الملخصات
+ */
+async function searchSummaries(query) {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .rpc('search_summaries', { search_query: query });
+
+    if (error) {
+      console.error('❌ خطأ في البحث:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ خطأ غير متوقع:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * حذف ملخص
+ */
+async function deleteSummary(summaryId) {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('file_summaries')
+      .delete()
+      .eq('id', summaryId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('❌ خطأ في حذف الملخص:', error);
+      return { success: false, error: error.message };
+    }
+
+    console.log('✓ تم حذف الملخص:', summaryId);
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ خطأ غير متوقع:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// دوال إدارة الاختبارات (Quizzes)
+// ═══════════════════════════════════════════════════════
+
+/**
+ * حفظ اختبار جديد
+ */
+async function saveQuiz(quizData) {
+  if (!supabase) {
+    console.warn('⚠️ Supabase غير متصل - لن يتم حفظ البيانات');
+    return { success: false, error: 'Supabase not configured' };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('quizzes')
+      .insert([quizData])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('❌ خطأ في حفظ الاختبار:', error);
+      return { success: false, error: error.message };
+    }
+
+    console.log('✓ تم حفظ الاختبار في قاعدة البيانات:', data.id);
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ خطأ غير متوقع:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * الحصول على جميع الاختبارات
+ */
+async function getAllQuizzes(limit = 50, offset = 0) {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+
+  try {
+    const { data, error, count } = await supabase
+      .from('quizzes')
+      .select(`
+        *,
+        files:source_file_id (
+          id,
+          file_name,
+          file_type,
+          mime_type
+        )
+      `, { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (error) {
+      console.error('❌ خطأ في جلب الاختبارات:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data, count };
+  } catch (error) {
+    console.error('❌ خطأ غير متوقع:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * الحصول على اختبار بواسطة ID
+ */
+async function getQuizById(quizId) {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('quizzes')
+      .select(`
+        *,
+        files:source_file_id (
+          id,
+          file_name,
+          file_type,
+          mime_type
+        )
+      `)
+      .eq('id', quizId)
+      .single();
+
+    if (error) {
+      console.error('❌ خطأ في جلب الاختبار:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ خطأ غير متوقع:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * البحث في الاختبارات
+ */
+async function searchQuizzes(query) {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .rpc('search_quizzes', { search_query: query });
+
+    if (error) {
+      console.error('❌ خطأ في البحث:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ خطأ غير متوقع:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * حذف اختبار
+ */
+async function deleteQuiz(quizId) {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+
+  try {
+    // الحصول على معلومات الاختبار أولاً
+    const { data: quizData, error: fetchError } = await supabase
+      .from('quizzes')
+      .select('*')
+      .eq('id', quizId)
+      .single();
+
+    if (fetchError) {
+      console.error('❌ خطأ في جلب الاختبار:', fetchError);
+      return { success: false, error: fetchError.message };
+    }
+
+    // حذف الاختبار
+    const { error: deleteError } = await supabase
+      .from('quizzes')
+      .delete()
+      .eq('id', quizId);
+
+    if (deleteError) {
+      console.error('❌ خطأ في حذف الاختبار:', deleteError);
+      return { success: false, error: deleteError.message };
+    }
+
+    console.log('✓ تم حذف الاختبار من قاعدة البيانات:', quizId);
+    return { success: true, data: quizData };
+  } catch (error) {
+    console.error('❌ خطأ غير متوقع:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * تحديث اختبار
+ */
+async function updateQuiz(quizId, updates) {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('quizzes')
+      .update(updates)
+      .eq('id', quizId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('❌ خطأ في تحديث الاختبار:', error);
+      return { success: false, error: error.message };
+    }
+
+    console.log('✓ تم تحديث الاختبار:', quizId);
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ خطأ غير متوقع:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// دوال الإحصائيات
+// ═══════════════════════════════════════════════════════
+
+/**
+ * الحصول على إحصائيات الاختبارات
+ */
+async function getQuizzesStats() {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('quizzes_stats')
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('❌ خطأ في جلب إحصائيات الاختبارات:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ خطأ غير متوقع:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * الحصول على إحصائيات الملخصات
+ */
+async function getSummariesStats() {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('summaries_stats')
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('❌ خطأ في جلب إحصائيات الملخصات:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ خطأ غير متوقع:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * الحصول على إحصائيات النظام الكاملة
+ */
+async function getSystemStats() {
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('system_stats')
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('❌ خطأ في جلب إحصائيات النظام:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ خطأ غير متوقع:', error);
+    return { success: false, error: error.message };
+  }
+}
+
 // ═══════════════════════════════════════════════════════
 // التصدير
 // ═══════════════════════════════════════════════════════
 
 module.exports = {
   supabase,
+  
+  // Files
   saveFile,
   getAllFiles,
   searchFiles,
@@ -271,7 +645,27 @@ module.exports = {
   getFileById,
   getStats,
   getFileType,
-  getFileSummary,   // <--- جديد
-  saveFileSummary,  // <--- جديد
+  
+  // Summaries
+  getFileSummary,
+  saveFileSummary,
+  getAllSummaries,
+  searchSummaries,
+  deleteSummary,
+  
+  // Quizzes
+  saveQuiz,
+  getAllQuizzes,
+  getQuizById,
+  searchQuizzes,
+  deleteQuiz,
+  updateQuiz,
+  
+  // Stats
+  getQuizzesStats,
+  getSummariesStats,
+  getSystemStats,
+  
+  // Utility
   isConfigured: () => supabase !== null
 };
