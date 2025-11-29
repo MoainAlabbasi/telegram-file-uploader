@@ -1,5 +1,12 @@
 [phases.setup]
-nixPkgs = ['python3', 'pandoc']
+nixPkgs = ["nodejs", "python3", "python3Packages.pip", "pandoc"]
 
 [phases.install]
-cmds = ['pip install -r requirements.txt']
+cmds = [
+  "npm install",
+  "python3 -m pip install --upgrade pip",
+  "python3 -m pip install python-docx openpyxl fpdf2 markdown"
+]
+
+[start]
+cmd = "node server.js"
