@@ -1,16 +1,25 @@
 -- ═══════════════════════════════════════════════════════
--- 🎓 تحديثات نظام الاختبارات والملخصات - MoTech Cloud v4.0
+-- 🎓 تحديثات نظام الاختبارات والملخصات - MoTech Cloud v4.1
 -- نسخ هذا الكود بالكامل والصقه في Supabase SQL Editor واضغط Run
+-- ═══════════════════════════════════════════════════════
+
+-- ⚠️⚠️⚠️ تحذير مهم ⚠️⚠️⚠️
+-- هذا السكربت يحذف جدول quizzes بالكامل ويعيد إنشاءه!
+-- إذا كان لديك بيانات اختبارات موجودة، سيتم حذفها!
+-- إذا كنت تريد الحفاظ على البيانات، استخدم ALTER TABLE بدلاً من DROP TABLE
 -- ═══════════════════════════════════════════════════════
 
 -- ═══════════════════════════════════════════════════════
 -- 1️⃣ إنشاء جدول الاختبارات (quizzes)
 -- ═══════════════════════════════════════════════════════
 
-CREATE TABLE IF NOT EXISTS quizzes (
+-- ⚠️ هام: حذف الجدول القديم وكل ما يعتمد عليه لضمان إضافة الأعمدة الجديدة
+DROP TABLE IF EXISTS quizzes CASCADE;
+
+CREATE TABLE quizzes (
     id BIGSERIAL PRIMARY KEY,
     quiz_name TEXT NOT NULL,
-    telegram_file_id TEXT NOT NULL UNIQUE,
+    telegram_file_id TEXT NOT NULL UNIQUE, -- العمود الجديد المطلوب
     source_file_id BIGINT REFERENCES files(id) ON DELETE CASCADE,
     source_file_name TEXT NOT NULL,
     question_count INTEGER DEFAULT 0,
@@ -38,6 +47,15 @@ CREATE INDEX IF NOT EXISTS idx_quizzes_created_at ON quizzes(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_quizzes_source_file_id ON quizzes(source_file_id);
 CREATE INDEX IF NOT EXISTS idx_quizzes_quiz_name ON quizzes USING gin(to_tsvector('arabic', quiz_name));
 
+-- إنشاء دالة لتحديث updated_at إذا لم تكن موجودة
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
 -- إنشاء مشغل (Trigger) لتحديث updated_at
 CREATE TRIGGER update_quizzes_updated_at
     BEFORE UPDATE ON quizzes
@@ -48,7 +66,7 @@ CREATE TRIGGER update_quizzes_updated_at
 -- 2️⃣ تحديث جدول الملخصات (file_summaries)
 -- ═══════════════════════════════════════════════════════
 
--- إضافة أعمدة جديدة
+-- إضافة أعمدة جديدة (لن تتأثر إذا كانت موجودة بالفعل)
 ALTER TABLE file_summaries ADD COLUMN IF NOT EXISTS summary_name TEXT;
 ALTER TABLE file_summaries ADD COLUMN IF NOT EXISTS word_count INTEGER DEFAULT 0;
 ALTER TABLE file_summaries ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}'::jsonb;
@@ -62,7 +80,7 @@ COMMENT ON COLUMN file_summaries.metadata IS 'بيانات إضافية (الل�
 -- إنشاء فهرس للبحث
 CREATE INDEX IF NOT EXISTS idx_summaries_summary_name ON file_summaries USING gin(to_tsvector('arabic', COALESCE(summary_name, '')));
 
--- إنشاء مشغر لتحديث updated_at
+-- إنشاء مشغل لتحديث updated_at
 DROP TRIGGER IF EXISTS update_file_summaries_updated_at ON file_summaries;
 CREATE TRIGGER update_file_summaries_updated_at
     BEFORE UPDATE ON file_summaries
@@ -76,23 +94,18 @@ CREATE TRIGGER update_file_summaries_updated_at
 -- تفعيل RLS على جدول quizzes
 ALTER TABLE quizzes ENABLE ROW LEVEL SECURITY;
 
--- سياسات للسماح بالعمليات العامة (يمكن تخصيصها لاحقاً)
+-- سياسات للسماح بالعمليات العامة
 CREATE POLICY "Allow public select on quizzes" ON quizzes
-    FOR SELECT
-    USING (true);
+    FOR SELECT USING (true);
 
 CREATE POLICY "Allow public insert on quizzes" ON quizzes
-    FOR INSERT
-    WITH CHECK (true);
+    FOR INSERT WITH CHECK (true);
 
 CREATE POLICY "Allow public update on quizzes" ON quizzes
-    FOR UPDATE
-    USING (true)
-    WITH CHECK (true);
+    FOR UPDATE USING (true) WITH CHECK (true);
 
 CREATE POLICY "Allow public delete on quizzes" ON quizzes
-    FOR DELETE
-    USING (true);
+    FOR DELETE USING (true);
 
 -- ═══════════════════════════════════════════════════════
 -- 4️⃣ إنشاء Views للإحصائيات
@@ -102,9 +115,9 @@ CREATE POLICY "Allow public delete on quizzes" ON quizzes
 CREATE OR REPLACE VIEW quizzes_stats AS
 SELECT 
     COUNT(*) as total_quizzes,
-    SUM(question_count) as total_questions,
-    SUM(total_score) as total_possible_score,
-    ROUND(AVG(question_count), 2) as avg_questions_per_quiz,
+    COALESCE(SUM(question_count), 0) as total_questions,
+    COALESCE(SUM(total_score), 0) as total_possible_score,
+    ROUND(AVG(COALESCE(question_count, 0)), 2) as avg_questions_per_quiz,
     MAX(created_at) as last_quiz_created,
     COUNT(DISTINCT source_file_id) as unique_source_files
 FROM quizzes;
@@ -115,8 +128,8 @@ COMMENT ON VIEW quizzes_stats IS 'إحصائيات شاملة عن الاختب�
 CREATE OR REPLACE VIEW summaries_stats AS
 SELECT 
     COUNT(*) as total_summaries,
-    SUM(word_count) as total_words,
-    ROUND(AVG(word_count), 2) as avg_words_per_summary,
+    COALESCE(SUM(word_count), 0) as total_words,
+    ROUND(AVG(COALESCE(word_count, 0)), 2) as avg_words_per_summary,
     MAX(created_at) as last_summary_created,
     COUNT(DISTINCT file_id) as unique_source_files
 FROM file_summaries;
@@ -228,71 +241,23 @@ BEGIN
     RAISE NOTICE '✅ تم تحديث قاعدة البيانات بنجاح!';
     RAISE NOTICE '═══════════════════════════════════════════════════════';
     RAISE NOTICE '';
-    RAISE NOTICE '✓ تم إنشاء جدول quizzes';
+    RAISE NOTICE '✓ تم إعادة إنشاء جدول quizzes مع العمود telegram_file_id';
     RAISE NOTICE '✓ تم تحديث جدول file_summaries';
-    RAISE NOTICE '✓ تم إنشاء الفهارس';
-    RAISE NOTICE '✓ تم إنشاء Views الإحصائيات';
-    RAISE NOTICE '✓ تم إنشاء الدوال المساعدة';
-    RAISE NOTICE '✓ تم تحديث سياسات RLS';
-    RAISE NOTICE '';
-    RAISE NOTICE '🎉 النظام جاهز لإنشاء وإدارة الاختبارات والملخصات!';
+    RAISE NOTICE '✓ تم إعادة إنشاء Views الإحصائيات';
+    RAISE NOTICE '✓ تم تحديث الدوال المساعدة وسياسات RLS';
     RAISE NOTICE '';
     RAISE NOTICE '═══════════════════════════════════════════════════════';
 END $$;
 
--- التحقق النهائي
+-- التحقق النهائي للأعمدة
 SELECT 
-    '✅ جدول quizzes' as check_item,
-    CASE 
-        WHEN EXISTS (
-            SELECT 1 
-            FROM information_schema.tables 
-            WHERE table_name = 'quizzes'
-        ) THEN 'موجود ✓'
-        ELSE 'غير موجود ✗'
-    END as status
-UNION ALL
-SELECT 
-    '✅ أعمدة file_summaries الجديدة' as check_item,
+    '✅ عمود telegram_file_id في quizzes' as check_item,
     CASE 
         WHEN EXISTS (
             SELECT 1 
             FROM information_schema.columns 
-            WHERE table_name = 'file_summaries' 
-            AND column_name = 'summary_name'
-        ) THEN 'موجودة ✓'
-        ELSE 'غير موجودة ✗'
-    END as status
-UNION ALL
-SELECT 
-    '✅ View quizzes_stats' as check_item,
-    CASE 
-        WHEN EXISTS (
-            SELECT 1 
-            FROM information_schema.views 
-            WHERE table_name = 'quizzes_stats'
+            WHERE table_name = 'quizzes' 
+            AND column_name = 'telegram_file_id'
         ) THEN 'موجود ✓'
         ELSE 'غير موجود ✗'
-    END as status
-UNION ALL
-SELECT 
-    '✅ View summaries_stats' as check_item,
-    CASE 
-        WHEN EXISTS (
-            SELECT 1 
-            FROM information_schema.views 
-            WHERE table_name = 'summaries_stats'
-        ) THEN 'موجود ✓'
-        ELSE 'غير موجود ✗'
-    END as status
-UNION ALL
-SELECT 
-    '✅ دالة search_quizzes' as check_item,
-    CASE 
-        WHEN EXISTS (
-            SELECT 1 
-            FROM pg_proc 
-            WHERE proname = 'search_quizzes'
-        ) THEN 'موجودة ✓'
-        ELSE 'غير موجودة ✗'
     END as status;
