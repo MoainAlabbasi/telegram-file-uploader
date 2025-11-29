@@ -1,449 +1,461 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>عارض المحتوى - MoTech Cloud</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <title>عارض المحتوى | MoTech Cloud</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
+
     <style>
+        /* --- 1. المتغيرات والتأسيس --- */
         :root {
-            --primary: #00d4ff;
-            --secondary: #a855f7;
-            --dark: #0f172a;
-            --glass: rgba(15, 23, 42, 0.85);
+            --primary: #00d4ff; --secondary: #a855f7; --accent: #06b6d4;
+            --bg-body: #020617; --bg-paper: #0f172a; --bg-glass: rgba(15, 23, 42, 0.95);
+            --border-color: rgba(0, 212, 255, 0.1); --text-main: #e2e8f0; --text-muted: #94a3b8;
+            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5); --code-bg: #1e293b;
         }
-        
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        [data-theme="light"] {
+            --primary: #0284c7; --secondary: #7e22ce; --accent: #0ea5e9;
+            --bg-body: #f8fafc; --bg-paper: #ffffff; --bg-glass: rgba(255, 255, 255, 0.95);
+            --border-color: rgba(0, 0, 0, 0.1); --text-main: #0f172a; --text-muted: #64748b;
+            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1); --code-bg: #f1f5f9;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         
         body {
-            font-family: 'Tajawal', sans-serif;
-            background: #020617;
-            color: #fff;
-            min-height: 100vh;
+            font-family: 'Tajawal', sans-serif; background: var(--bg-body); color: var(--text-main);
+            min-height: 100vh; overflow-x: hidden; transition: 0.3s;
         }
-        
+
+        /* خلفية جمالية */
         body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px),
-                        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            z-index: -1;
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 10% 20%, rgba(0, 212, 255, 0.05), transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.05), transparent 40%);
+            z-index: -1; pointer-events: none;
         }
-        
+
+        /* --- 2. شريط الأدوات --- */
         .toolbar {
-            position: sticky;
-            top: 0;
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            flex-wrap: wrap;
-            gap: 15px;
+            position: sticky; top: 0; background: var(--bg-glass); backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border-color); padding: 12px 25px;
+            display: flex; justify-content: space-between; align-items: center; z-index: 1000;
+            box-shadow: var(--shadow);
         }
-        
-        .toolbar-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
+
+        .toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 15px; }
+
         .back-btn {
-            background: rgba(0, 212, 255, 0.15);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            color: var(--primary);
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Tajawal';
-            font-weight: 600;
-            transition: 0.3s;
-            text-decoration: none;
-            display: inline-block;
+            display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 10px;
+            background: rgba(0, 212, 255, 0.1); color: var(--primary); text-decoration: none;
+            font-weight: 600; font-size: 0.95rem; transition: 0.3s;
         }
-        
-        .back-btn:hover {
-            background: rgba(0, 212, 255, 0.3);
+        .back-btn:hover { background: var(--primary); color: #fff; }
+
+        .doc-meta { display: flex; flex-direction: column; }
+        .doc-title { font-weight: 700; font-size: 1.1rem; color: var(--text-main); }
+        .doc-status { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+
+        /* أزرار التحكم */
+        .control-group {
+            display: flex; background: rgba(128, 128, 128, 0.1); border-radius: 8px;
+            padding: 4px; border: 1px solid var(--border-color);
         }
-        
-        .title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--secondary);
+
+        .icon-btn {
+            width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent;
+            color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; font-size: 1rem;
         }
-        
-        .toolbar-right {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
+        .icon-btn:hover { background: rgba(128, 128, 128, 0.1); color: var(--text-main); }
+        .icon-btn.active { background: var(--primary); color: #fff; }
+
+        /* قائمة التصدير */
+        .export-dropdown { position: relative; }
         .export-btn {
-            background: rgba(168, 85, 247, 0.15);
-            border: 1px solid rgba(168, 85, 247, 0.3);
-            color: var(--secondary);
-            padding: 10px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Tajawal';
-            font-weight: 600;
+            padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border-color);
+            background: transparent; color: var(--text-main); cursor: pointer;
+            font-family: inherit; font-weight: 600; display: flex; align-items: center; gap: 8px;
             transition: 0.3s;
-            font-size: 0.9rem;
         }
+        .export-btn:hover { border-color: var(--secondary); color: var(--secondary); background: rgba(168, 85, 247, 0.05); }
         
-        .export-btn:hover {
-            background: rgba(168, 85, 247, 0.3);
+        .dropdown-menu {
+            position: absolute; top: 110%; left: 0; background: var(--bg-paper);
+            border: 1px solid var(--border-color); border-radius: 12px; padding: 8px; min-width: 180px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: none; flex-direction: column; gap: 5px;
         }
+        .export-dropdown:hover .dropdown-menu { display: flex; }
         
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 0 20px;
+        .dropdown-item {
+            padding: 10px; border-radius: 8px; border: none; background: transparent;
+            color: var(--text-main); text-align: right; cursor: pointer; font-family: inherit;
+            display: flex; align-items: center; gap: 10px; transition: 0.2s;
         }
-        
-        .content-card {
-            background: var(--glass);
-            border: 1px solid rgba(0, 212, 255, 0.1);
-            border-radius: 20px;
-            padding: 40px;
-            min-height: 400px;
+        .dropdown-item:hover { background: rgba(0, 212, 255, 0.1); color: var(--primary); }
+
+        /* --- 3. منطقة المحتوى --- */
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+
+        .paper {
+            background: var(--bg-paper); border-radius: 24px; padding: 60px; min-height: 800px;
+            box-shadow: var(--shadow); border: 1px solid var(--border-color); position: relative;
+            transition: 0.3s;
         }
-        
-        .content {
-            line-height: 1.9;
-            color: #e2e8f0;
-            font-size: 1.1rem;
+
+        /* --- 4. تنسيقات الماركدوان --- */
+        .content-body { line-height: 1.8; font-size: 1.1rem; color: var(--text-main); }
+
+        /* أحجام الخطوط */
+        .font-s .content-body { font-size: 0.95rem; }
+        .font-m .content-body { font-size: 1.1rem; }
+        .font-l .content-body { font-size: 1.3rem; }
+
+        /* وضع الكتاب */
+        .paper.book-mode .content-body {
+            column-count: 2; column-gap: 50px; text-align: justify; column-rule: 1px solid var(--border-color);
         }
-        
-        .content h1 {
-            color: var(--secondary);
-            font-size: 2rem;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid rgba(168, 85, 247, 0.3);
-        }
-        
-        .content h2 {
-            color: var(--primary);
-            font-size: 1.6rem;
-            margin-top: 30px;
-            margin-bottom: 15px;
-        }
-        
-        .content h3 {
-            color: var(--primary);
-            font-size: 1.3rem;
-            margin-top: 25px;
-            margin-bottom: 12px;
-        }
-        
-        .content p {
-            margin-bottom: 15px;
-        }
-        
-        .content ul, .content ol {
-            margin-right: 30px;
-            margin-bottom: 15px;
-        }
-        
-        .content li {
-            margin-bottom: 8px;
-        }
-        
-        .content strong {
-            color: var(--secondary);
-            font-weight: 700;
-        }
-        
-        .content em {
-            color: var(--primary);
-        }
-        
-        .content code {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            color: var(--primary);
-        }
-        
-        .content pre {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin-bottom: 15px;
-        }
-        
-        .content blockquote {
-            border-right: 4px solid var(--secondary);
-            padding-right: 20px;
-            margin: 20px 0;
-            color: #94a3b8;
-            font-style: italic;
-        }
-        
-        .content hr {
-            border: none;
-            border-top: 1px solid rgba(0, 212, 255, 0.2);
-            margin: 30px 0;
-        }
-        
-        .content table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        
-        .content th, .content td {
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            padding: 12px;
-            text-align: right;
-        }
-        
-        .content th {
-            background: rgba(168, 85, 247, 0.2);
-            color: var(--secondary);
-            font-weight: 700;
-        }
-        
-        .loader {
-            text-align: center;
-            padding: 60px 20px;
-        }
-        
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 6px solid rgba(255,255,255,0.1);
-            border-top-color: var(--secondary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .error-message {
-            text-align: center;
-            padding: 60px 20px;
-            color: #ef4444;
-        }
-        
-        .error-icon {
-            font-size: 60px;
-            margin-bottom: 20px;
-        }
-        
+        .paper.book-mode .content-body h1, .paper.book-mode .content-body h2, 
+        .paper.book-mode .content-body pre, .paper.book-mode .content-body table { column-span: all; }
+
+        /* العناوين والنصوص */
+        .content-body h1 { font-size: 2.2rem; color: var(--primary); margin-bottom: 1.5rem; border-bottom: 2px solid rgba(0, 212, 255, 0.2); padding-bottom: 1rem; }
+        .content-body h2 { font-size: 1.8rem; color: var(--secondary); margin-top: 2rem; margin-bottom: 1rem; }
+        .content-body h3 { font-size: 1.4rem; color: var(--text-main); margin-top: 1.5rem; font-weight: 700; }
+        .content-body p { margin-bottom: 1.2rem; }
+        .content-body strong { color: var(--secondary); font-weight: 800; }
+        .content-body ul, .content-body ol { margin-right: 2rem; margin-bottom: 1.5rem; }
+        .content-body code { font-family: 'Fira Code', monospace; background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px; color: var(--accent); }
+        .content-body pre { background: var(--code-bg); padding: 20px; border-radius: 12px; overflow-x: auto; border: 1px solid var(--border-color); margin: 20px 0; }
+        .content-body pre code { background: transparent; padding: 0; color: inherit; }
+        .content-body table { width: 100%; border-collapse: collapse; margin: 25px 0; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .content-body th, .content-body td { padding: 15px; text-align: right; border-bottom: 1px solid var(--border-color); }
+        .content-body th { background: rgba(0, 212, 255, 0.1); color: var(--primary); }
+
+        /* Loader & Error */
+        .loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px; }
+        .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error-state { text-align: center; padding: 50px; color: #ef4444; display: none; }
+        .error-state i { font-size: 4rem; margin-bottom: 15px; }
+
         @media (max-width: 768px) {
-            .toolbar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .toolbar-left, .toolbar-right {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .content-card {
-                padding: 25px;
-            }
+            .toolbar { flex-direction: column; align-items: stretch; gap: 15px; }
+            .toolbar-left, .toolbar-right { justify-content: space-between; }
+            .paper { padding: 30px 20px; border-radius: 0; border: none; box-shadow: none; }
+            .paper.book-mode .content-body { column-count: 1; }
         }
     </style>
 </head>
 <body>
 
-<div class="toolbar">
-    <div class="toolbar-left">
-        <a href="#" class="back-btn" id="backBtn">⬅️ رجوع</a>
-        <div class="title" id="contentTitle">جاري التحميل...</div>
-    </div>
-    <div class="toolbar-right">
-        <button class="export-btn" onclick="exportContent('docx')">📄 DOCX</button>
-        <button class="export-btn" onclick="exportContent('pdf')">📕 PDF</button>
-        <button class="export-btn" onclick="exportContent('xlsx')">📊 Excel</button>
-        <button class="export-btn" onclick="exportContent('pptx')">📽️ PowerPoint</button>
-        <button class="export-btn" onclick="exportContent('txt')">📝 TXT</button>
-        <button class="export-btn" onclick="exportContent('md')">📋 MD</button>
-    </div>
-</div>
-
-<div class="container">
-    <div class="content-card">
-        <div id="loadingState" class="loader">
-            <div class="spinner"></div>
-            <p>جاري تحميل المحتوى...</p>
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <a href="#" id="backBtn" class="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
+            <div class="doc-meta">
+                <div class="doc-title" id="docTitle">جاري التحميل...</div>
+                <div class="doc-status" id="docStatus">
+                    <i class="fas fa-circle-notch fa-spin"></i> استدعاء البيانات
+                </div>
+            </div>
         </div>
-        
-        <div id="errorState" class="error-message" style="display: none;">
-            <div class="error-icon">❌</div>
-            <h2>حدث خطأ</h2>
-            <p id="errorMessage"></p>
+
+        <div class="toolbar-right">
+            <div class="control-group">
+                <button class="icon-btn" onclick="setFontSize('s')" title="خط صغير">A-</button>
+                <button class="icon-btn active" onclick="setFontSize('m')" title="خط متوسط">A</button>
+                <button class="icon-btn" onclick="setFontSize('l')" title="خط كبير">A+</button>
+            </div>
+
+            <div class="control-group">
+                <button class="icon-btn active" id="normalViewBtn" onclick="setViewMode('normal')" title="عرض عادي">
+                    <i class="fas fa-file-alt"></i>
+                </button>
+                <button class="icon-btn" id="bookViewBtn" onclick="setViewMode('book')" title="وضع الكتاب">
+                    <i class="fas fa-book-open"></i>
+                </button>
+            </div>
+
+            <div class="export-dropdown">
+                <button class="export-btn">
+                    <i class="fas fa-download"></i> تصدير
+                </button>
+                <div class="dropdown-menu">
+                    <button class="dropdown-item" onclick="exportFile('pdf')">
+                        <i class="fas fa-file-pdf" style="color: #ef4444;"></i> ملف PDF
+                    </button>
+                    <button class="dropdown-item" onclick="exportFile('docx')">
+                        <i class="fas fa-file-word" style="color: #3b82f6;"></i> ملف Word
+                    </button>
+                    <button class="dropdown-item" onclick="exportFile('pptx')">
+                        <i class="fas fa-file-powerpoint" style="color: #f59e0b;"></i> عرض PPT
+                    </button>
+                    <button class="dropdown-item" onclick="exportFile('xlsx')">
+                        <i class="fas fa-file-excel" style="color: #10b981;"></i> ملف Excel
+                    </button>
+                    <hr style="border-color: var(--border-color); margin: 5px 0;">
+                    <button class="dropdown-item" onclick="exportFile('txt')">
+                        <i class="fas fa-file-alt"></i> نص عادي (TXT)
+                    </button>
+                </div>
+            </div>
         </div>
-        
-        <div id="contentArea" class="content" style="display: none;"></div>
     </div>
-</div>
 
-<script>
-let contentType = '';
-let contentId = '';
-let rawContent = '';
-let contentFilename = '';
-
-window.onload = async () => {
-    // استخراج النوع والمعرف من URL
-    const pathParts = window.location.pathname.split('/');
-    contentType = pathParts[2]; // 'quiz' أو 'summary'
-    contentId = pathParts[3];
-    
-    // تحديد زر الرجوع
-    const backBtn = document.getElementById('backBtn');
-    if (contentType === 'quiz') {
-        backBtn.href = '/quizzes';
-    } else if (contentType === 'summary') {
-        backBtn.href = '/summaries';
-    }
-    
-    // تحميل المحتوى
-    await loadContent();
-};
-
-async function loadContent() {
-    try {
-        let apiUrl = '';
-        let metaUrl = '';
-        
-        if (contentType === 'quiz') {
-            apiUrl = `/api/quiz/content/${contentId}`;
-            metaUrl = `/api/quiz/${contentId}`;
-        } else if (contentType === 'summary') {
-            apiUrl = `/api/summary/content/${contentId}`;
-            // للملخصات، contentId هو file_id
-            metaUrl = null; // سنحصل على الاسم من المحتوى نفسه
-        } else {
-            throw new Error('نوع محتوى غير معروف');
-        }
-        
-        // جلب البيانات الوصفية إذا كانت متاحة
-        if (metaUrl) {
-            const metaRes = await fetch(metaUrl);
-            const metaData = await metaRes.json();
+    <div class="container">
+        <div class="paper" id="paper">
             
-            if (metaData.success) {
-                const item = contentType === 'quiz' ? metaData.quiz : metaData.summary;
-                const name = contentType === 'quiz' ? item.quiz_name : item.summary_name;
-                document.getElementById('contentTitle').textContent = name;
-                contentFilename = name;
+            <div id="loader" class="loader-container">
+                <div class="spinner"></div>
+                <p style="color: var(--text-muted);">جاري معالجة المحتوى وعرضه...</p>
+            </div>
+
+            <div id="errorState" class="error-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3 id="errorTitle">حدث خطأ</h3>
+                <p id="errorDesc">تعذر تحميل المحتوى المطلوب.</p>
+                <button onclick="location.reload()" class="back-btn" style="margin: 20px auto; display: inline-flex;">
+                    <i class="fas fa-sync"></i> إعادة المحاولة
+                </button>
+            </div>
+
+            <div id="contentBody" class="content-body" style="display: none;"></div>
+
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. إدارة الحالة (State Management)
+        // ==========================================
+        let currentContent = '';
+        let contentType = ''; // 'summary' or 'quiz'
+        let contentId = '';
+        let contentTitle = '';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPreferences();
+            
+            // تحليل الرابط (يدعم المسار القديم والجديد)
+            const params = new URLSearchParams(window.location.search);
+            const pathParts = window.location.pathname.split('/');
+            
+            // مثال: /viewer/quiz/123
+            if (pathParts.length > 3) {
+                contentType = pathParts[2];
+                contentId = pathParts[3];
+            } else {
+                // مثال: /viewer.html?type=quiz&id=123
+                contentType = params.get('type');
+                contentId = params.get('id');
+            }
+
+            const mode = params.get('mode');
+
+            // ضبط زر الرجوع
+            const backBtn = document.getElementById('backBtn');
+            if (contentType === 'quiz') backBtn.href = '/quizzes';
+            else if (contentType === 'summary') backBtn.href = '/summaries';
+            else backBtn.href = '/';
+
+            // بدء التحميل
+            if (mode === 'temp') {
+                loadTempContent();
+            } else {
+                fetchContentData();
+            }
+        });
+
+        // ==========================================
+        // 2. تحميل البيانات (Core Data Logic) - تم الإصلاح
+        // ==========================================
+        function loadTempContent() {
+            const tempResult = sessionStorage.getItem('temp_ai_result');
+            if (tempResult) {
+                renderContent(tempResult, 'معاينة النتيجة (غير محفوظ)');
+                document.getElementById('docStatus').innerHTML = '<i class="fas fa-eye"></i> وضع المعاينة';
+            } else {
+                showError('لا يوجد محتوى للعرض', 'ربما انتهت صلاحية الجلسة. حاول إنشاء المحتوى مجدداً.');
             }
         }
-        
-        // جلب المحتوى (Streaming)
-        const contentRes = await fetch(apiUrl);
-        
-        if (!contentRes.ok) {
-            throw new Error('فشل تحميل المحتوى');
+
+        async function fetchContentData() {
+            if (!contentId || !contentType) {
+                showError('رابط غير صالح', 'مفقود المعرف أو نوع المحتوى.');
+                return;
+            }
+
+            try {
+                // 1. جلب العنوان والمعلومات (Metadata)
+                let metaUrl = '';
+                if (contentType === 'quiz') metaUrl = `/api/quiz/${contentId}`;
+                
+                let title = (contentType === 'quiz' ? 'اختبار' : 'ملخص');
+
+                if (metaUrl) {
+                    try {
+                        const metaRes = await fetch(metaUrl);
+                        if(metaRes.ok) {
+                            const metaData = await metaRes.json();
+                            if (metaData.success && metaData.quiz) {
+                                title = metaData.quiz.quiz_name;
+                            }
+                        }
+                    } catch(e) { console.log('Metadata fetch failed, continuing...'); }
+                }
+
+                // 2. جلب المحتوى النصي - الحل المبسط
+                const contentUrl = `/api/${contentType}/content/${contentId}`;
+                const contentRes = await fetch(contentUrl);
+
+                if (!contentRes.ok) throw new Error('فشل الاتصال بالسيرفر');
+
+                const rawText = await contentRes.text();
+                
+                // عرض المحتوى مباشرة بدون تعقيد
+                renderContent(rawText, title);
+
+                document.getElementById('docStatus').innerHTML = '<i class="fas fa-check-circle" style="color: #10b981;"></i> تم التحميل';
+
+            } catch (error) {
+                console.error(error);
+                showError('فشل تحميل الملف', 'تأكد من اتصالك بالإنترنت أو أن الملف لا يزال موجوداً.');
+            }
         }
-        
-        rawContent = await contentRes.text();
-        
-        // عرض المحتوى
-        displayContent(rawContent);
-        
-    } catch (error) {
-        console.error('Error loading content:', error);
-        showError(error.message);
-    }
-}
 
-function displayContent(markdown) {
-    const loadingState = document.getElementById('loadingState');
-    const contentArea = document.getElementById('contentArea');
-    
-    // تحويل Markdown إلى HTML
-    const html = marked.parse(markdown);
-    
-    // عرض المحتوى
-    contentArea.innerHTML = html;
-    
-    // إخفاء اللودر وإظهار المحتوى
-    loadingState.style.display = 'none';
-    contentArea.style.display = 'block';
-    
-    // تحديث العنوان إذا لم يكن محدداً
-    if (!contentFilename) {
-        const firstH1 = contentArea.querySelector('h1');
-        if (firstH1) {
-            contentFilename = firstH1.textContent;
-            document.getElementById('contentTitle').textContent = contentFilename;
-        } else {
-            contentFilename = contentType === 'quiz' ? 'اختبار' : 'ملخص';
+        // ==========================================
+        // 3. العرض والمعالجة
+        // ==========================================
+        function renderContent(markdown, title) {
+            currentContent = markdown;
+            contentTitle = title;
+            
+            document.getElementById('docTitle').textContent = title;
+            document.title = `${title} | MoTech Cloud`;
+
+            const contentBody = document.getElementById('contentBody');
+            
+            // إعدادات Marked
+            marked.setOptions({
+                breaks: true,
+                gfm: true,
+                highlight: function(code, lang) {
+                    const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                    return hljs.highlight(code, { language }).value;
+                }
+            });
+
+            contentBody.innerHTML = marked.parse(markdown);
+
+            // تفعيل تلوين الأكواد
+            document.querySelectorAll('pre code').forEach((el) => {
+                hljs.highlightElement(el);
+            });
+
+            // إخفاء اللودر
+            document.getElementById('loader').style.display = 'none';
+            contentBody.style.display = 'block';
+            contentBody.style.animation = 'fadeIn 0.5s ease';
         }
-    }
-}
 
-function showError(message) {
-    const loadingState = document.getElementById('loadingState');
-    const errorState = document.getElementById('errorState');
-    const errorMessage = document.getElementById('errorMessage');
-    
-    loadingState.style.display = 'none';
-    errorState.style.display = 'block';
-    errorMessage.textContent = message;
-}
-
-async function exportContent(format) {
-    if (!rawContent) {
-        alert('المحتوى غير محمّل بعد');
-        return;
-    }
-    
-    try {
-        const response = await fetch('/api/export', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                content: rawContent,
-                format: format,
-                filename: contentFilename || 'محتوى'
-            })
-        });
-        
-        if (!response.ok) {
-            throw new Error('فشل التصدير');
+        function showError(title, desc) {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+            document.getElementById('errorTitle').textContent = title;
+            document.getElementById('errorDesc').textContent = desc;
+            document.getElementById('docStatus').innerHTML = '<i class="fas fa-times-circle" style="color: #ef4444;"></i> خطأ';
         }
-        
-        // تحميل الملف
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${contentFilename}.${format}`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        
-    } catch (error) {
-        console.error('Export error:', error);
-        alert('❌ حدث خطأ أثناء التصدير');
-    }
-}
-</script>
 
+        // ==========================================
+        // 4. أدوات التحكم
+        // ==========================================
+        function setFontSize(size) {
+            const paper = document.getElementById('paper');
+            paper.classList.remove('font-s', 'font-m', 'font-l');
+            paper.classList.add(`font-${size}`);
+            
+            document.querySelectorAll('.control-group button').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            localStorage.setItem('pref_fontSize', size);
+        }
+
+        function setViewMode(mode) {
+            const paper = document.getElementById('paper');
+            const btnNormal = document.getElementById('normalViewBtn');
+            const btnBook = document.getElementById('bookViewBtn');
+
+            if (mode === 'book') {
+                paper.classList.add('book-mode');
+                btnBook.classList.add('active');
+                btnNormal.classList.remove('active');
+            } else {
+                paper.classList.remove('book-mode');
+                btnBook.classList.remove('active');
+                btnNormal.classList.add('active');
+            }
+            localStorage.setItem('pref_viewMode', mode);
+        }
+
+        function loadPreferences() {
+            const fontSize = localStorage.getItem('pref_fontSize') || 'm';
+            const viewMode = localStorage.getItem('pref_viewMode') || 'normal';
+            setFontSize(fontSize);
+            setViewMode(viewMode);
+        }
+
+        // ==========================================
+        // 5. التصدير (Export)
+        // ==========================================
+        async function exportFile(format) {
+            if (!currentContent) return alert('لا يوجد محتوى للتصدير');
+
+            const btn = document.querySelector('.export-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
+            btn.style.pointerEvents = 'none';
+
+            try {
+                // إرسال الطلب لخدمة التحويل
+                const response = await fetch('/api/export', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        markdown: currentContent,
+                        format: format,
+                        filename: contentTitle || 'document'
+                    })
+                });
+
+                if (!response.ok) throw new Error('فشل التحويل');
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${contentTitle}.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+            } catch (error) {
+                console.error(error);
+                alert('خطأ أثناء التصدير.');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.style.pointerEvents = 'auto';
+            }
+        }
+    </script>
 </body>
 </html>
