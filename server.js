@@ -583,7 +583,8 @@ app.post('/api/quiz/generate-ai', async (req, res) => {
         const fBuffer = await (await fetch(`https://api.telegram.org/file/bot${BOT_TOKEN}/${fInfo.result.file_path}`)).buffer();
         
         // إعداد الموديل والموجه
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+       // const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
         
         let customPrompt = `أنشئ اختباراً تعليمياً من المحتوى المرفق بالمواصفات التالية:
 - عدد الأسئلة: ${questionCount}
@@ -634,7 +635,8 @@ app.post('/api/quiz/generate-ai', async (req, res) => {
             metadata: {
                 questionTypes: questionTypes || [],
                 createdBy: 'ai',
-                model: 'gemini-2.0-flash-exp'
+                model: 'gemini-2.5-flash'
+                
             }
         };
         
