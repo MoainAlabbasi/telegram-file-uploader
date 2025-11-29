@@ -1,12 +1,17 @@
+# 1. إعداد الحزم: نطلب Node و Python
 [phases.setup]
-nixPkgs = ["nodejs", "python3", "python3Packages.pip", "pandoc"]
+nixPkgs = ["nodejs", "python311", "pandoc"]
 
+# 2. مرحلة التثبيت: ننشئ البيئة الافتراضية يدوياً ونثبت المكتبات داخلها
+# لاحظ أننا نستخدم مسار البيئة الافتراضية الكامل لتجنب مشاكل المسارات
 [phases.install]
 cmds = [
-  "npm install",
-  "python3 -m pip install --upgrade pip",
-  "python3 -m pip install python-docx openpyxl fpdf2 markdown"
+    "npm install",
+    "python3 -m venv /app/venv",
+    "/app/venv/bin/pip install -r requirements.txt"
 ]
 
+# 3. مرحلة التشغيل: نقوم بتفعيل البيئة الافتراضية قبل تشغيل السيرفر
+# هذا يجعل السيرفر يرى مكتبات بايثون المثبتة
 [start]
-cmd = "node server.js"
+cmd = ". /app/venv/bin/activate && node server.js"
