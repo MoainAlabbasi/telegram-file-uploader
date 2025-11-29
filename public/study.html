@@ -1,209 +1,298 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎓 المساعد الدراسي - MoTech Cloud v4.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MoTech Cloud | المساعد الدراسي</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> <style>
-        /* نفس ستايل المشروع الأصلي للحفاظ على الهوية */
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- نفس متغيرات التصميم الموحدة --- */
         :root {
-            --primary: #00d4ff; --secondary: #a855f7; --dark: #0f172a; --glass: rgba(15, 23, 42, 0.85);
-            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --primary: #00d4ff;
+            --secondary: #a855f7;
+            --bg-body: #020617;
+            --bg-glass: rgba(15, 23, 42, 0.85);
+            --bg-glass-light: rgba(255, 255, 255, 0.05);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border-color: rgba(0, 212, 255, 0.1);
+            --sidebar-width: 260px;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Tajawal', sans-serif; background: #020617; color: #fff; min-height: 100vh; padding: 20px;
+
+        [data-theme="light"] {
+            --primary: #0284c7; --secondary: #7e22ce; --bg-body: #f8fafc;
+            --bg-glass: rgba(255, 255, 255, 0.9); --bg-glass-light: rgba(0, 0, 0, 0.05);
+            --text-main: #0f172a; --text-muted: #64748b; --border-color: rgba(0, 0, 0, 0.1);
         }
-        /* خلفية شبكية */
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Tajawal', sans-serif; background: var(--bg-body); color: var(--text-main); min-height: 100vh; overflow-x: hidden; transition: 0.3s; }
+        
+        /* الخلفية */
         body::before {
             content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px),
-                        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px; z-index: -1;
+            background: radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.05), transparent 40%);
+            z-index: -1; pointer-events: none;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; }
+        /* --- Layout --- */
+        .dashboard-container { display: flex; min-height: 100vh; }
         
-        .header {
-            text-align: center; margin-bottom: 40px; padding: 30px;
-            background: var(--glass); border-radius: 20px; border: 1px solid rgba(0, 212, 255, 0.2);
+        /* Sidebar (نفس الكود الموحد) */
+        .sidebar {
+            width: var(--sidebar-width); background: var(--bg-glass); backdrop-filter: blur(15px);
+            border-left: 1px solid var(--border-color); padding: 20px; display: flex; flex-direction: column;
+            position: fixed; right: 0; top: 0; height: 100vh; z-index: 100; transition: 0.3s;
         }
-        h1 { color: var(--secondary); font-size: 2.2rem; margin-bottom: 10px; }
-        
+        .logo-area { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+        .logo-area h2 { font-size: 1.6rem; color: var(--primary); font-weight: 800; }
+        .nav-links { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px;
+            color: var(--text-muted); text-decoration: none; font-weight: 600; transition: 0.2s;
+        }
+        .nav-item:hover, .nav-item.active { background: rgba(0, 212, 255, 0.1); color: var(--primary); }
+        .nav-item i { width: 24px; text-align: center; }
+
+        /* Main Content */
+        .main-content {
+            margin-right: var(--sidebar-width); width: calc(100% - var(--sidebar-width));
+            padding: 20px 30px; transition: 0.3s;
+        }
+
+        /* Header */
+        .top-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
+            background: var(--bg-glass); padding: 15px 20px; border-radius: 16px;
+            border: 1px solid var(--border-color); backdrop-filter: blur(10px);
+        }
+        .icon-btn {
+            width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border-color);
+            background: var(--bg-glass-light); color: var(--text-main); cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 1.1rem; transition: 0.2s;
+        }
+        .icon-btn:hover { color: var(--primary); border-color: var(--primary); }
+        .mobile-menu-btn { display: none; }
+
+        /* --- Study Content --- */
+        .study-header {
+            text-align: center; padding: 40px 20px; margin-bottom: 30px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(168, 85, 247, 0.1));
+            border-radius: 20px; border: 1px solid var(--border-color);
+        }
+        .study-header h1 { font-size: 2rem; margin-bottom: 10px; color: var(--text-main); }
+        .study-header p { color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+
         .files-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;
         }
-        
+
         .file-card {
-            background: var(--glass); border: 1px solid rgba(0, 212, 255, 0.1); border-radius: 16px;
-            padding: 20px; transition: transform 0.3s; position: relative; overflow: hidden;
+            background: var(--bg-glass); border: 1px solid var(--border-color); border-radius: 16px;
+            padding: 20px; transition: 0.3s; display: flex; flex-direction: column;
+            position: relative; overflow: hidden;
         }
-        .file-card:hover { transform: translateY(-5px); border-color: var(--secondary); }
-        
-        .file-icon { font-size: 40px; margin-bottom: 15px; }
-        .file-name { font-weight: 700; margin-bottom: 15px; height: 50px; overflow: hidden; }
-        
-        .ai-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .file-card:hover { transform: translateY(-5px); border-color: var(--secondary); box-shadow: 0 10px 30px -10px rgba(168, 85, 247, 0.2); }
+
+        .file-icon { font-size: 2.5rem; margin-bottom: 15px; color: var(--text-muted); }
+        .file-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .file-meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; }
+
+        .ai-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; }
         .ai-btn {
-            flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer;
-            font-family: 'Tajawal'; font-weight: 600; transition: 0.3s;
+            padding: 10px; border-radius: 10px; border: 1px solid transparent; cursor: pointer;
+            font-family: inherit; font-weight: 600; font-size: 0.9rem; transition: 0.3s;
             display: flex; align-items: center; justify-content: center; gap: 5px;
         }
+        .btn-summary {
+            background: rgba(0, 212, 255, 0.1); color: var(--primary); border-color: rgba(0, 212, 255, 0.3);
+        }
+        .btn-summary:hover { background: rgba(0, 212, 255, 0.2); }
         
-        .btn-summary { background: rgba(0, 212, 255, 0.15); color: #00d4ff; border: 1px solid rgba(0, 212, 255, 0.3); }
-        .btn-summary:hover { background: rgba(0, 212, 255, 0.3); }
-        
-        .btn-quiz { background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.3); }
-        .btn-quiz:hover { background: rgba(168, 85, 247, 0.3); }
+        .btn-quiz {
+            background: rgba(168, 85, 247, 0.1); color: var(--secondary); border-color: rgba(168, 85, 247, 0.3);
+        }
+        .btn-quiz:hover { background: rgba(168, 85, 247, 0.2); }
 
-        /* نافذة النتائج (Modal) */
-        .modal {
+        /* Loading Modal */
+        .loader-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8); z-index: 1000; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000;
+            justify-content: center; align-items: center; text-align: center;
         }
-        .modal.active { display: flex; animation: fadeIn 0.3s; }
-        
-        .modal-content {
-            background: #0f172a; width: 90%; max-width: 800px; max-height: 85vh;
-            border-radius: 20px; border: 1px solid var(--secondary); padding: 30px;
-            overflow-y: auto; position: relative; box-shadow: 0 0 50px rgba(168, 85, 247, 0.2);
+        .loader-content {
+            background: var(--bg-glass); padding: 40px; border-radius: 20px;
+            border: 1px solid var(--primary); max-width: 400px;
         }
-        
-        .close-modal {
-            position: absolute; left: 20px; top: 20px; background: none; border: none;
-            color: #fff; font-size: 24px; cursor: pointer;
-        }
-        
-        .result-area {
-            margin-top: 20px; line-height: 1.8; color: #e2e8f0; font-size: 1.1rem;
-        }
-        /* تنسيق Markdown */
-        .result-area h1, .result-area h2 { color: var(--primary); margin-top: 20px; }
-        .result-area ul { margin-right: 20px; margin-bottom: 15px; }
-        .result-area strong { color: var(--secondary); }
-
-        /* Loader */
-        .loader {
-            display: none; text-align: center; padding: 40px;
-        }
-        .loader.active { display: block; }
         .spinner {
-            width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.1);
-            border-top-color: var(--secondary); border-radius: 50%;
-            animation: spin 1s linear infinite; margin: 0 auto 15px;
+            width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: var(--primary); border-radius: 50%;
+            animation: spin 1s linear infinite; margin: 0 auto 20px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(100%); width: 260px; box-shadow: -5px 0 15px rgba(0,0,0,0.5); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-right: 0; width: 100%; padding: 15px; }
+            .mobile-menu-btn { display: flex; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>🎓 المساعد الدراسي الذكي</h1>
-        <p style="color: #94a3b8;">حلل ملفاتك واحصل على ملخصات واختبارات ذكية بالذكاء الاصطناعي</p>
-        <div style="margin-top: 15px;">
-            <a href="/summaries" style="color: var(--primary); margin-left: 15px;">📝 الملخصات المحفوظة</a>
-            <a href="/quizzes" style="color: var(--primary); margin-left: 15px;">📚 الاختبارات المحفوظة</a>
-            <a href="/quiz-creator" style="color: var(--primary); margin-left: 15px;">➕ إنشاء اختبار</a>
-            <a href="/" style="color: var(--primary);">🏠 الرئيسية</a>
-        </div>
-    </div>
+    <div class="dashboard-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="logo-area"><h2>MoTech ☁️</h2></div>
+            <nav class="nav-links">
+                <a href="/" class="nav-item"><i class="fas fa-home"></i> الرئيسية</a>
+                <a href="/gallery" class="nav-item"><i class="fas fa-images"></i> المعرض</a>
+                <a href="/study" class="nav-item active"><i class="fas fa-brain"></i> المساعد الذكي</a>
+                <a href="/quizzes" class="nav-item"><i class="fas fa-clipboard-list"></i> الاختبارات</a>
+                <a href="/summaries" class="nav-item"><i class="fas fa-file-alt"></i> الملخصات</a>
+            </nav>
+            <div style="margin-top: auto;"><a href="#" class="nav-item" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> خروج</a></div>
+        </aside>
 
-    <div class="files-grid" id="filesGrid">
-        </div>
-</div>
+        <main class="main-content">
+            <header class="top-header">
+                <button class="icon-btn mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="header-title"><h1>المساعد الدراسي</h1></div>
+                <div class="header-actions">
+                    <button class="icon-btn" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
+                </div>
+            </header>
 
-<div class="modal" id="resultModal">
-    <div class="modal-content">
-        <button class="close-modal" onclick="closeModal()">✕</button>
-        <h2 id="modalTitle" style="color: var(--primary); margin-bottom: 20px;">النتيجة</h2>
-        
-        <div class="loader" id="loader">
-            <div class="spinner"></div>
-            <p>جاري تحليل الملف واستخراج المعلومات... 🤖</p>
-        </div>
-        
-        <div class="result-area" id="resultContent"></div>
-    </div>
-</div>
+            <div class="study-header">
+                <h1>🧠 اختر ملفاً للبدء</h1>
+                <p>استخدم الذكاء الاصطناعي لتلخيص المحاضرات أو إنشاء اختبارات تفاعلية من ملفاتك مباشرة.</p>
+            </div>
 
-<script>
-    // تحميل الملفات عند البدء
-    window.onload = async () => {
-        try {
-            const res = await fetch('/api/files?limit=50'); // نجلب آخر 50 ملف
-            const data = await res.json();
-            if(data.success) renderFiles(data.files);
-        } catch (e) { console.error(e); }
-    };
-
-    function renderFiles(files) {
-        const grid = document.getElementById('filesGrid');
-        // نعرض فقط المستندات والصور (الفيديو والصوت قد يكون صعب تحليلهم حالياً)
-        const supportedFiles = files.filter(f => ['document', 'image'].includes(f.file_type));
-        
-        if(supportedFiles.length === 0) {
-            grid.innerHTML = '<p style="text-align:center; grid-column:1/-1;">لا توجد ملفات قابلة للتحليل حالياً</p>';
-            return;
-        }
-
-        grid.innerHTML = supportedFiles.map(file => `
-            <div class="file-card">
-                <div class="file-icon">${file.file_type === 'image' ? '🖼️' : '📄'}</div>
-                <div class="file-name">${file.file_name}</div>
-                <div class="ai-actions">
-                    <button class="ai-btn btn-summary" onclick="processFile(${file.id}, 'summarize')">
-                        📝 تلخيص
-                    </button>
-                    <button class="ai-btn btn-quiz" onclick="processFile(${file.id}, 'quiz')">
-                        ❓ اختبار
-                    </button>
+            <div class="files-grid" id="filesGrid">
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary);"></i>
+                    <p style="margin-top: 10px; color: var(--text-muted);">جاري تحميل ملفاتك...</p>
                 </div>
             </div>
-        `).join('');
-    }
+        </main>
+    </div>
 
-    async function processFile(id, type) {
-        const modal = document.getElementById('resultModal');
-        const loader = document.getElementById('loader');
-        const content = document.getElementById('resultContent');
-        const title = document.getElementById('modalTitle');
+    <div id="loaderModal" class="loader-modal">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <h3 style="color: var(--text-main); margin-bottom: 10px;">جاري المعالجة بالذكاء الاصطناعي...</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">قد يستغرق هذا بضع ثوانٍ حسب حجم الملف.</p>
+        </div>
+    </div>
 
-        modal.classList.add('active');
-        loader.classList.add('active');
-        content.innerHTML = '';
-        title.textContent = type === 'summarize' ? '📝 ملخص الملف' : '🧠 اختبار مقترح';
-
-        try {
-            // هنا نطلب الـ API الذي سننشئه في السيرفر
-            const res = await fetch('/api/ai/generate', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ fileId: id, action: type })
-            });
-            
-            const data = await res.json();
-            
-            loader.classList.remove('active');
-            if(data.success) {
-                // نستخدم مكتبة marked لتحويل نص الماركدون إلى HTML جميل
-                content.innerHTML = marked.parse(data.result);
-            } else {
-                content.innerHTML = `<p style="color:red">حدث خطأ: ${data.error}</p>`;
-            }
-        } catch (err) {
-            loader.classList.remove('active');
-            content.innerHTML = `<p style="color:red">خطأ في الاتصال بالسيرفر</p>`;
+    <script>
+        // --- Shared Logic ---
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+        
+        function toggleTheme() {
+            const html = document.documentElement;
+            const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            document.getElementById('themeIcon').className = newTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
         }
-    }
 
-    function closeModal() {
-        document.getElementById('resultModal').classList.remove('active');
-    }
-</script>
+        window.onload = () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.getElementById('themeIcon').className = savedTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+            loadFiles();
+        };
 
+        // --- Study Logic ---
+        async function loadFiles() {
+            try {
+                const res = await fetch('/api/files?limit=50');
+                const data = await res.json();
+                const grid = document.getElementById('filesGrid');
+                
+                if (!data.success || data.files.length === 0) {
+                    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
+                        <i class="fas fa-folder-open" style="font-size: 3rem; margin-bottom: 10px;"></i>
+                        <p>لا توجد ملفات قابلة للتحليل. قم برفع ملفات جديدة.</p>
+                    </div>`;
+                    return;
+                }
+
+                // تصفية الملفات (نصوص وصور فقط)
+                const validFiles = data.files.filter(f => ['document', 'image'].includes(f.file_type));
+
+                grid.innerHTML = validFiles.map(file => `
+                    <div class="file-card">
+                        <div class="file-icon"><i class="${getFileIcon(file.file_type)}"></i></div>
+                        <div class="file-title" title="${file.file_name}">${file.file_name}</div>
+                        <div class="file-meta">${formatBytes(file.file_size)} • ${new Date(file.created_at).toLocaleDateString('ar-EG')}</div>
+                        <div class="ai-actions">
+                            <button class="ai-btn btn-summary" onclick="processFile(${file.id}, 'summarize')">
+                                <i class="fas fa-file-alt"></i> تلخيص
+                            </button>
+                            <button class="ai-btn btn-quiz" onclick="processFile(${file.id}, 'quiz')">
+                                <i class="fas fa-question-circle"></i> اختبار
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        function getFileIcon(type) {
+            return type === 'image' ? 'fas fa-file-image' : 'fas fa-file-alt';
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        // --- AI Processing ---
+        async function processFile(fileId, action) {
+            const loader = document.getElementById('loaderModal');
+            loader.style.display = 'flex';
+
+            try {
+                const res = await fetch('/api/ai/generate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ fileId, action })
+                });
+                
+                const data = await res.json();
+                loader.style.display = 'none';
+
+                if (data.success) {
+                    // التوجيه لصفحة العرض مع تمرير المحتوى أو المعرف
+                    // هنا نفترض أن السيرفر حفظ النتيجة وأعاد لنا ID أو أننا سنعرض النتيجة مباشرة
+                    // الأفضل: حفظ النتيجة في قاعدة البيانات وتوجيه المستخدم لصفحة العرض
+                    // سأقوم بتوجيه المستخدم لصفحة viewer مع ID الملف ونوع العملية
+                    
+                    // إذا كان الكود الحالي يعيد النص فقط (بدون حفظ)، سنحتاج لتعديل ذلك لاحقاً
+                    // حالياً، سنفترض أننا سنعرضه في صفحة viewer عن طريق sessionStorage مؤقتاً إذا لم يكن محفوظاً
+                    
+                    if (data.cached || data.savedId) {
+                         window.location.href = `/viewer.html?type=${action}&id=${data.savedId || fileId}`;
+                    } else {
+                        // تخزين مؤقت للنتيجة للعرض
+                        sessionStorage.setItem('temp_ai_result', data.result);
+                        window.location.href = `/viewer.html?type=${action}&mode=temp`;
+                    }
+                } else {
+                    alert('حدث خطأ: ' + data.error);
+                }
+            } catch (err) {
+                loader.style.display = 'none';
+                alert('فشل الاتصال بالسيرفر');
+            }
+        }
+    </script>
 </body>
 </html>
