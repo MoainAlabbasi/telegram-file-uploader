@@ -87,6 +87,40 @@
             flex-wrap: wrap;
         }
         
+        /* أزرار التحكم في العرض */
+        .view-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: rgba(0, 212, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Tajawal';
+            font-weight: 600;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .control-btn.active {
+            background: var(--primary);
+            color: #000;
+            border-color: var(--primary);
+        }
+        
         .export-btn {
             background: rgba(168, 85, 247, 0.15);
             border: 1px solid rgba(168, 85, 247, 0.3);
@@ -116,13 +150,34 @@
             border-radius: 20px;
             padding: 40px;
             min-height: 400px;
+            transition: all 0.3s ease;
+        }
+        
+        /* وضع الكتاب */
+        .content-card.book-mode .content {
+            column-count: 2;
+            column-gap: 40px;
+            column-rule: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        
+        .content-card.book-mode .content h1,
+        .content-card.book-mode .content h2,
+        .content-card.book-mode .content h3 {
+            column-span: all;
         }
         
         .content {
             line-height: 1.9;
             color: #e2e8f0;
             font-size: 1.1rem;
+            transition: font-size 0.3s ease;
         }
+        
+        /* أحجام الخط */
+        .content.font-small { font-size: 0.9rem; }
+        .content.font-medium { font-size: 1.1rem; }
+        .content.font-large { font-size: 1.3rem; }
+        .content.font-xlarge { font-size: 1.5rem; }
         
         .content h1 {
             color: var(--secondary);
@@ -271,6 +326,17 @@
         <div class="title" id="contentTitle">جاري التحميل...</div>
     </div>
     <div class="toolbar-right">
+        <!-- أزرار التحكم في العرض -->
+        <div class="view-controls">
+            <button class="control-btn" onclick="changeFontSize('small')" title="تصغير الخط">A-</button>
+            <button class="control-btn active" onclick="changeFontSize('medium')" title="حجم عادي">A</button>
+            <button class="control-btn" onclick="changeFontSize('large')" title="تكبير الخط">A+</button>
+            <button class="control-btn" onclick="changeFontSize('xlarge')" title="تكبير إضافي">A++</button>
+            <span style="border-left: 1px solid rgba(255,255,255,0.2); height: 20px; margin: 0 5px;"></span>
+            <button class="control-btn active" id="normalModeBtn" onclick="toggleBookMode(false)" title="عرض عادي">📄</button>
+            <button class="control-btn" id="bookModeBtn" onclick="toggleBookMode(true)" title="وضع الكتاب">📖</button>
+        </div>
+        <!-- أزرار التصدير -->
         <button class="export-btn" onclick="exportContent('docx')">📄 DOCX</button>
         <button class="export-btn" onclick="exportContent('pdf')">📕 PDF</button>
         <button class="export-btn" onclick="exportContent('xlsx')">📊 Excel</button>
@@ -381,6 +447,66 @@ function displayContent(markdown) {
     // إخفاء اللودر وإظهار المحتوى
     loadingState.style.display = 'none';
     contentArea.style.display = 'block';
+}
+
+// دوال التحكم في العرض
+function changeFontSize(size) {
+    const contentArea = document.getElementById('contentArea');
+    const buttons = document.querySelectorAll('.view-controls .control-btn');
+    
+    // إزالة جميع فئات الخط
+    contentArea.classList.remove('font-small', 'font-medium', 'font-large', 'font-xlarge');
+    
+    // إضافة الفئة الجديدة
+    contentArea.classList.add(`font-${size}`);
+    
+    // تحديث الأزرار
+    buttons.forEach((btn, index) => {
+        if (index < 4) { // أزرار الخط فقط
+            btn.classList.remove('active');
+        }
+    });
+    event.target.classList.add('active');
+    
+    // حفظ التفضيل
+    localStorage.setItem('fontSize', size);
+}
+
+function toggleBookMode(enable) {
+    const contentCard = document.querySelector('.content-card');
+    const normalBtn = document.getElementById('normalModeBtn');
+    const bookBtn = document.getElementById('bookModeBtn');
+    
+    if (enable) {
+        contentCard.classList.add('book-mode');
+        normalBtn.classList.remove('active');
+        bookBtn.classList.add('active');
+        localStorage.setItem('bookMode', 'true');
+    } else {
+        contentCard.classList.remove('book-mode');
+        normalBtn.classList.add('active');
+        bookBtn.classList.remove('active');
+        localStorage.setItem('bookMode', 'false');
+    }
+}
+
+// تحميل التفضيلات المحفوظة
+function loadPreferences() {
+    const fontSize = localStorage.getItem('fontSize') || 'medium';
+    const bookMode = localStorage.getItem('bookMode') === 'true';
+    
+    // تطبيق حجم الخط
+    const contentArea = document.getElementById('contentArea');
+    contentArea.classList.add(`font-${fontSize}`);
+    
+    // تطبيق وضع الكتاب
+    if (bookMode) {
+        toggleBookMode(true);
+    }
+}
+
+// تحميل التفضيلات عند بدء الصفحة
+window.addEventListener('DOMContentLoaded', loadPreferences)
     
     // تحديث العنوان إذا لم يكن محدداً
     if (!contentFilename) {

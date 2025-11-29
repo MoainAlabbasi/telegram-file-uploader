@@ -73,9 +73,31 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static('public'));
 
-// إعداد Multer
+// إعداد Multer مع دعم UTF-8 للأسماء العربية
 const storage = multer.memoryStorage();
-const upload = multer({ limits: { fileSize: 50 * 1024 * 1024 } });
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 50 * 1024 * 1024 },
+    // حفظ الأسماء العربية بشكل صحيح
+    preservePath: true,
+    // تفعيل معالجة UTF-8
+    fileFilter: (req, file, cb) => {
+        // تصحيح الترميز إذا كان مشوهاً
+        if (file.originalname) {
+            try {
+                // محاولة فك الترميز الخاطئ
+                const decoded = Buffer.from(file.originalname, 'latin1').toString('utf8');
+                // التحقق من أن الاسم صحيح
+                if (decoded && !decoded.includes('�')) {
+                    file.originalname = decoded;
+                }
+            } catch (e) {
+                // إذا فشل التصحيح، استخدم الاسم كما هو
+            }
+        }
+        cb(null, true);
+    }
+});
 
 // ═══════════════════════════════════════════════════════
 // 🛠️ دوال مساعدة (Helpers)
