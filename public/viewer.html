@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>عارض المحتوى - MoTech Cloud</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
     <style>
         :root {
             --primary: #00d4ff;
@@ -33,8 +30,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 10% 20%, rgba(0, 212, 255, 0.05), transparent 40%),
-                        radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.05), transparent 40%);
+            background: linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
             z-index: -1;
         }
         
@@ -42,7 +40,7 @@
             position: sticky;
             top: 0;
             background: var(--glass);
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(0, 212, 255, 0.2);
             padding: 15px 20px;
             display: flex;
@@ -51,7 +49,6 @@
             z-index: 100;
             flex-wrap: wrap;
             gap: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
         
         .toolbar-left {
@@ -71,14 +68,11 @@
             font-weight: 600;
             transition: 0.3s;
             text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            display: inline-block;
         }
         
         .back-btn:hover {
             background: rgba(0, 212, 255, 0.3);
-            transform: translateX(5px);
         }
         
         .title {
@@ -96,41 +90,35 @@
         /* أزرار التحكم في العرض */
         .view-controls {
             display: flex;
-            gap: 5px;
+            gap: 10px;
             align-items: center;
             background: rgba(0, 212, 255, 0.1);
-            padding: 6px;
-            border-radius: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
             border: 1px solid rgba(0, 212, 255, 0.2);
         }
         
         .control-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
             padding: 8px 12px;
             border-radius: 6px;
             cursor: pointer;
             font-family: 'Tajawal';
             font-weight: 600;
-            transition: 0.2s;
+            transition: 0.3s;
             font-size: 0.9rem;
-            min-width: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         
         .control-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.2);
         }
         
         .control-btn.active {
             background: var(--primary);
             color: #000;
             border-color: var(--primary);
-            box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
         }
         
         .export-btn {
@@ -144,15 +132,10 @@
             font-weight: 600;
             transition: 0.3s;
             font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
         }
         
         .export-btn:hover {
             background: rgba(168, 85, 247, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
         }
         
         .container {
@@ -168,7 +151,6 @@
             padding: 40px;
             min-height: 400px;
             transition: all 0.3s ease;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
         }
         
         /* وضع الكتاب */
@@ -180,9 +162,7 @@
         
         .content-card.book-mode .content h1,
         .content-card.book-mode .content h2,
-        .content-card.book-mode .content h3,
-        .content-card.book-mode .content pre,
-        .content-card.book-mode .content table {
+        .content-card.book-mode .content h3 {
             column-span: all;
         }
         
@@ -247,24 +227,16 @@
             background: rgba(0, 0, 0, 0.3);
             padding: 2px 6px;
             border-radius: 4px;
-            font-family: 'Fira Code', 'Courier New', monospace;
+            font-family: 'Courier New', monospace;
             color: var(--primary);
         }
         
         .content pre {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 20px;
-            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
             overflow-x: auto;
             margin-bottom: 15px;
-            border: 1px solid rgba(0, 212, 255, 0.2);
-        }
-        
-        .content pre code {
-            background: transparent;
-            padding: 0;
-            color: inherit;
-            font-family: 'Fira Code', monospace;
         }
         
         .content blockquote {
@@ -285,8 +257,6 @@
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
-            border-radius: 8px;
-            overflow: hidden;
         }
         
         .content th, .content td {
@@ -345,10 +315,6 @@
             .content-card {
                 padding: 25px;
             }
-            
-            .content-card.book-mode .content {
-                column-count: 1;
-            }
         }
     </style>
 </head>
@@ -356,9 +322,7 @@
 
 <div class="toolbar">
     <div class="toolbar-left">
-        <a href="#" class="back-btn" id="backBtn">
-            <i class="fas fa-arrow-right"></i> رجوع
-        </a>
+        <a href="#" class="back-btn" id="backBtn">⬅️ رجوع</a>
         <div class="title" id="contentTitle">جاري التحميل...</div>
     </div>
     <div class="toolbar-right">
@@ -369,29 +333,16 @@
             <button class="control-btn" onclick="changeFontSize('large')" title="تكبير الخط">A+</button>
             <button class="control-btn" onclick="changeFontSize('xlarge')" title="تكبير إضافي">A++</button>
             <span style="border-left: 1px solid rgba(255,255,255,0.2); height: 20px; margin: 0 5px;"></span>
-            <button class="control-btn active" id="normalModeBtn" onclick="toggleBookMode(false)" title="عرض عادي">
-                <i class="fas fa-file-alt"></i>
-            </button>
-            <button class="control-btn" id="bookModeBtn" onclick="toggleBookMode(true)" title="وضع الكتاب">
-                <i class="fas fa-book-open"></i>
-            </button>
+            <button class="control-btn active" id="normalModeBtn" onclick="toggleBookMode(false)" title="عرض عادي">📄</button>
+            <button class="control-btn" id="bookModeBtn" onclick="toggleBookMode(true)" title="وضع الكتاب">📖</button>
         </div>
         <!-- أزرار التصدير -->
-        <button class="export-btn" onclick="exportContent('pdf')">
-            <i class="fas fa-file-pdf"></i> PDF
-        </button>
-        <button class="export-btn" onclick="exportContent('xlsx')">
-            <i class="fas fa-file-excel"></i> Excel
-        </button>
-        <button class="export-btn" onclick="exportContent('pptx')">
-            <i class="fas fa-file-powerpoint"></i> PowerPoint
-        </button>
-        <button class="export-btn" onclick="exportContent('txt')">
-            <i class="fas fa-file-alt"></i> TXT
-        </button>
-        <button class="export-btn" onclick="exportContent('md')">
-            <i class="fab fa-markdown"></i> MD
-        </button>
+        <button class="export-btn" onclick="exportContent('docx')">📄 DOCX</button>
+        <button class="export-btn" onclick="exportContent('pdf')">📕 PDF</button>
+        <button class="export-btn" onclick="exportContent('xlsx')">📊 Excel</button>
+        <button class="export-btn" onclick="exportContent('pptx')">📽️ PowerPoint</button>
+        <button class="export-btn" onclick="exportContent('txt')">📝 TXT</button>
+        <button class="export-btn" onclick="exportContent('md')">📋 MD</button>
     </div>
 </div>
 
@@ -487,43 +438,15 @@ function displayContent(markdown) {
     const loadingState = document.getElementById('loadingState');
     const contentArea = document.getElementById('contentArea');
     
-    // إعدادات Marked
-    marked.setOptions({
-        breaks: true,
-        gfm: true,
-        highlight: function(code, lang) {
-            if (lang && hljs.getLanguage(lang)) {
-                return hljs.highlight(code, { language: lang }).value;
-            }
-            return hljs.highlightAuto(code).value;
-        }
-    });
-    
     // تحويل Markdown إلى HTML
     const html = marked.parse(markdown);
     
     // عرض المحتوى
     contentArea.innerHTML = html;
     
-    // تفعيل تلوين الأكواد
-    document.querySelectorAll('pre code').forEach((el) => {
-        hljs.highlightElement(el);
-    });
-    
     // إخفاء اللودر وإظهار المحتوى
     loadingState.style.display = 'none';
     contentArea.style.display = 'block';
-    
-    // تحديث العنوان إذا لم يكن محدداً
-    if (!contentFilename) {
-        const firstH1 = contentArea.querySelector('h1');
-        if (firstH1) {
-            contentFilename = firstH1.textContent;
-            document.getElementById('contentTitle').textContent = contentFilename;
-        } else {
-            contentFilename = contentType === 'quiz' ? 'اختبار' : 'ملخص';
-        }
-    }
 }
 
 // دوال التحكم في العرض
@@ -574,9 +497,7 @@ function loadPreferences() {
     
     // تطبيق حجم الخط
     const contentArea = document.getElementById('contentArea');
-    if (contentArea) {
-        contentArea.classList.add(`font-${fontSize}`);
-    }
+    contentArea.classList.add(`font-${fontSize}`);
     
     // تطبيق وضع الكتاب
     if (bookMode) {
@@ -585,7 +506,19 @@ function loadPreferences() {
 }
 
 // تحميل التفضيلات عند بدء الصفحة
-window.addEventListener('DOMContentLoaded', loadPreferences);
+window.addEventListener('DOMContentLoaded', loadPreferences)
+    
+    // تحديث العنوان إذا لم يكن محدداً
+    if (!contentFilename) {
+        const firstH1 = contentArea.querySelector('h1');
+        if (firstH1) {
+            contentFilename = firstH1.textContent;
+            document.getElementById('contentTitle').textContent = contentFilename;
+        } else {
+            contentFilename = contentType === 'quiz' ? 'اختبار' : 'ملخص';
+        }
+    }
+}
 
 function showError(message) {
     const loadingState = document.getElementById('loadingState');
