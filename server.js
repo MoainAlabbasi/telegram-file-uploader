@@ -363,7 +363,9 @@ app.post('/api/ai/generate', async (req, res) => {
     const fBuffer = await (await fetch(`https://api.telegram.org/file/bot${BOT_TOKEN}/${fInfo.result.file_path}`)).buffer();
 
     // ب. إعداد الموديل
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    //const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
 
     // ج. اختيار الموجه
     const prompt = action === 'summarize' ? summaryPrompt : quizPrompt;
