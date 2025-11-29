@@ -277,7 +277,7 @@
         });
 
         // ==========================================
-        // 2. تحميل البيانات (Core Data Logic) - تم الإصلاح
+        // 2. تحميل البيانات (Core Data Logic) - تم الإصلاح هنا
         // ==========================================
         function loadTempContent() {
             const tempResult = sessionStorage.getItem('temp_ai_result');
@@ -297,8 +297,10 @@
 
             try {
                 // 1. جلب العنوان والمعلومات (Metadata)
+                // نستخدم مسار الـ API القديم الذي يرجع JSON لمعرفة الاسم
                 let metaUrl = '';
                 if (contentType === 'quiz') metaUrl = `/api/quiz/${contentId}`;
+                // للملخصات قد لا يكون هناك مسار مباشر للميتا، لذا سنتخطى إذا لم يوجد
                 
                 let title = (contentType === 'quiz' ? 'اختبار' : 'ملخص');
 
@@ -314,16 +316,31 @@
                     } catch(e) { console.log('Metadata fetch failed, continuing...'); }
                 }
 
-                // 2. جلب المحتوى النصي - الحل المبسط
+                // 2. جلب المحتوى النصي (The Fix!)
+                // نستخدم .text() بدلاً من .json() لأن السيرفر يرسل ماركدون خام
                 const contentUrl = `/api/${contentType}/content/${contentId}`;
                 const contentRes = await fetch(contentUrl);
 
                 if (!contentRes.ok) throw new Error('فشل الاتصال بالسيرفر');
 
                 const rawText = await contentRes.text();
-                
-                // عرض المحتوى مباشرة بدون تعقيد
-                renderContent(rawText, title);
+
+                // التحقق: هل الرد هو JSON خطأ أم نص حقيقي؟
+                try {
+                    // محاولة تحليله كـ JSON (فقط في حال كان السيرفر يرسل JSON يحتوي على الحقل content)
+                    const jsonCheck = JSON.parse(rawText);
+                    if (jsonCheck && (jsonCheck.content || jsonCheck.result)) {
+                        renderContent(jsonCheck.content || jsonCheck.result, title);
+                    } else if (jsonCheck && jsonCheck.error) {
+                        throw new Error(jsonCheck.error);
+                    } else {
+                        // إنه نص عادي (وهو المطلوب)
+                        renderContent(rawText, title);
+                    }
+                } catch (e) {
+                    // فشل تحليل JSON، هذا يعني أنه نص Markdown خام (وهذا صحيح!)
+                    renderContent(rawText, title);
+                }
 
                 document.getElementById('docStatus').innerHTML = '<i class="fas fa-check-circle" style="color: #10b981;"></i> تم التحميل';
 
@@ -350,8 +367,8 @@
                 breaks: true,
                 gfm: true,
                 highlight: function(code, lang) {
-                    const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-                    return hljs.highlight(code, { language }).value;
+                    const language = highlight.getLanguage(lang) ? lang : 'plaintext';
+                    return highlight.highlight(code, { language }).value;
                 }
             });
 
